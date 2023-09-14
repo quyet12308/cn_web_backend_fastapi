@@ -2,7 +2,7 @@ import smtplib
 import getpass
 from security_info import passwords,emails
 
-def send_email_confirm_registration(password, code, to_email):
+def send_email_confirm_registration(username,password, code, to_email):
     HOST = "smtp-mail.outlook.com"
     PORT = 587
 
@@ -10,7 +10,7 @@ def send_email_confirm_registration(password, code, to_email):
 
     MESSAGE = f"""Subject: Send email from Nhom13
 
-    Hello guy are you register new acc .
+    Hello {username} are you register new acc .
 
     Here are your code :
 

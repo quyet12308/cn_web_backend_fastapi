@@ -35,6 +35,34 @@ def query_database_for_login_register_by_name( name):
 
     return data
 
+def query_database_for_login_register_by_id( id):
+    # Kết nối tới cơ sở dữ liệu
+    conn = sqlite3.connect('database/login_register.db')
+    cursor = conn.cursor()
+
+    # Thực hiện truy vấn dữ liệu từ bảng
+    cursor.execute(f"SELECT * FROM basic_login_register WHERE id=?", (id,))
+    data = cursor.fetchone()
+
+    # Đóng kết nối
+    conn.close()
+
+    return data
+
+def query_database_for_login_register_by_email( email):
+    # Kết nối tới cơ sở dữ liệu
+    conn = sqlite3.connect('database/login_register.db')
+    cursor = conn.cursor()
+
+    # Thực hiện truy vấn dữ liệu từ bảng
+    cursor.execute(f"SELECT * FROM basic_login_register WHERE email=?", (email,))
+    data = cursor.fetchone()
+
+    # Đóng kết nối
+    conn.close()
+
+    return data
+
 # lưu dữ liệu 
 def save_data_for_login_register_in_table( username, password,email,createdTime ):
     # Kết nối tới cơ sở dữ liệu
@@ -52,3 +80,6 @@ def save_data_for_login_register_in_table( username, password,email,createdTime 
 # a = query_database_for_login_register_by_name(name="abc")
 # print(a)
 
+for i in range(10):
+    a = query_database_for_login_register_by_id(i)
+    print(a)

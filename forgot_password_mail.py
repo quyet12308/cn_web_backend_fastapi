@@ -2,7 +2,7 @@ import smtplib
 import getpass
 from security_info import passwords ,emails
 
-def send_email_forgot_password(password, code, to_email):
+def send_email_forgot_password(username,password, code, to_email):
     HOST = "smtp-mail.outlook.com"
     PORT = 587
 
@@ -10,7 +10,7 @@ def send_email_forgot_password(password, code, to_email):
 
     MESSAGE = f"""Subject: Send email from Nhom13
 
-    Hello guy are you forgot password .
+    Hello {username} are you forgot password .
 
     Here are your code :
 
