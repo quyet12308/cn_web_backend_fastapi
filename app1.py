@@ -8,12 +8,12 @@ from pydantic import BaseModel
 from login_register_database import query_database_for_login_register_by_name,save_data_for_login_register_in_table,query_database_for_login_register_by_email
 from confirm_email_registration import send_email_confirm_registration
 from get_code import generate_random_6_digit_number
-from catcha_code_for_send_email import delayed_delete_confirm_code_by_email,query_database_for_confirm_code_by_email,save_data_for_confirm_code_in_table
+from catcha_code_for_send_email import delayed_delete_confirm_code_by_email,query_database_for_confirm_code_by_email,save_data_for_confirm_code_in_table,query_data_by_email_with_max_id
 
 from security_info import emails,passwords,urls
 from string_python_en import responses
 
-from gettime import gettime2
+from gettime import gettime2,check_time_range
 app = FastAPI()
 
 # Cấu hình CORS
@@ -108,7 +108,8 @@ async def register_basic(request_data: dict):
         password = request_data['pass']
         email = request_data['email']
         
-        check_email = query_database_for_login_register_by_name(name=name)
+        time_now = gettime2()
+        check_email = query_database_for_login_register_by_email(email=email)
         if check_email :
                 return {"response":{
                     "message":responses["email_da_duoc_dang_ky"],
@@ -118,10 +119,10 @@ async def register_basic(request_data: dict):
 
             #send confirm email
             code_randum = generate_random_6_digit_number()
-            time_now = gettime2()
+            
             send_email_confirm_registration(username=name,code=code_randum,password=passwords["outlook"],to_email=email)
             save_data_for_confirm_code_in_table(createdTime=time_now,email=email,username=name,code=code_randum)
-            asyncio.create_task(delayed_delete_confirm_code_by_email(email=email,delay_minutes=3))
+            # asyncio.create_task(delayed_delete_confirm_code_by_email(email=email,delay_minutes=3))# chức năng này tạm thời đóng băng để thực hiện giải pháp khác ( so sánh time tạo và time truy cập)
             
             return {"response":{
                     "message":responses["check_email_to_get_code"],
@@ -144,21 +145,31 @@ async def register_confirm_code_email(request_data: dict):
 
 
         time_now = gettime2()
+        print(f"time now {time_now}")
+        print(type(time_now))
         #get code from catcha ( sqlite delete after 3 minutes)
-        check_code = query_database_for_confirm_code_by_email(email=email)
+        check_code = query_data_by_email_with_max_id(email=email)
         id1 , username1,email1,createdTime1 ,code1 = check_code
+        print(f"created time = {createdTime1}")
         if check_code:
-            if code1 == check_code:
-                save_data_for_login_register_in_table(createdTime=time_now,email=email,password=password,username=name)
-                return {"response":{
-                    "message":responses["dang_ky_thanh_cong"],
-                    "status":True
-                }}
+            check_time = check_time_range(now_time=time_now,created_time=createdTime1,minute=3)#true nếu tạo và truy cập trong khoảng 3 phút
+            if check_time:
+                if code1 == code:
+                    save_data_for_login_register_in_table(createdTime=time_now,email=email,password=password,username=name)
+                    return {"response":{
+                        "message":responses["dang_ky_thanh_cong"],
+                        "status":True
+                    }}
+                else:
+                    return {"response":{
+                        "message":responses["dang_ky_that_bai"],
+                        "status":False
+                    }}
             else:
                 return {"response":{
-                    "message":responses["dang_ky_that_bai"],
-                    "status":False
-                }}
+                        "message":responses["code_bi_qua_thoi_gian"],
+                        "status":False
+                    }}
 
 
         

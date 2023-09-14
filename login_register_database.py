@@ -77,9 +77,25 @@ def save_data_for_login_register_in_table( username, password,email,createdTime 
     conn.commit()
     conn.close()
 
+#delete
+def delete_data_for_login_and_register_by_name(name):
+    # Đợi một khoảng thời gian (tính bằng giây) trước khi thực hiện xóa
+    # time.sleep(delay_minutes * 60)
+
+    # Kết nối tới cơ sở dữ liệu
+    conn = sqlite3.connect('database/login_register.db')
+    cursor = conn.cursor()
+
+    # Xóa dữ liệu từ bảng test dựa trên tên
+    cursor.execute("DELETE FROM basic_login_register WHERE username=?", (name,))
+
+    # Lưu thay đổi và đóng kết nối
+    conn.commit()
+    conn.close()
+
 # a = query_database_for_login_register_by_name(name="abc")
 # print(a)
-
+delete_data_for_login_and_register_by_name(name="quyet12306")
 for i in range(10):
     a = query_database_for_login_register_by_id(i)
     print(a)

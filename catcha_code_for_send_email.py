@@ -37,6 +37,20 @@ def query_database_for_confirm_code_by_email( email):
 
     return data
 
+def query_data_by_email_with_max_id(email):
+    # Kết nối tới cơ sở dữ liệu
+    conn = sqlite3.connect('database/catchat_code_for_send_email.db')
+    cursor = conn.cursor()
+
+    # Thực hiện truy vấn
+    cursor.execute("SELECT * FROM catchat_code_for_send_email WHERE email=? ORDER BY id DESC LIMIT 1", (email,))
+    result = cursor.fetchone()  # Lấy một dòng dữ liệu
+
+    # Đóng kết nối
+    conn.close()
+
+    return result
+
 def query_database_for_confirm_code_by_id( id):
     # Kết nối tới cơ sở dữ liệu
     conn = sqlite3.connect('database/catchat_code_for_send_email.db')
@@ -85,6 +99,17 @@ async def delayed_delete_confirm_code_by_email(email, delay_minutes):
 # print(a)
 
 
-for i in range(10):
-    a = query_database_for_confirm_code_by_id(id=i)
-    print(a)
+# for i in range(1):
+#     a = query_database_for_confirm_code_by_id(id=i)
+#     id_ , name , email , time_ , code = a
+#     print(time_)
+#     print(type(time_))
+
+# a = query_database_for_confirm_code_by_id(id=1)
+# id_ , name , email , time_ , code = a
+# print(time_)
+# print(type(time_))
+
+# for i in range(15):
+#     c = query_database_for_confirm_code_by_id(i)
+#     print(c)
