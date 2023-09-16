@@ -110,6 +110,6 @@ async def delayed_delete_confirm_code_by_email(email, delay_minutes):
 # print(time_)
 # print(type(time_))
 
-# for i in range(15):
+# for i in range(30):
 #     c = query_database_for_confirm_code_by_id(i)
 #     print(c)

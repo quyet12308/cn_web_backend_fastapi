@@ -93,9 +93,27 @@ def delete_data_for_login_and_register_by_name(name):
     conn.commit()
     conn.close()
 
+def update_user_by_email(email, new_username, new_password):
+    # Kết nối tới cơ sở dữ liệu
+    conn = sqlite3.connect('database/login_register.db')
+    cursor = conn.cursor()
+    
+    # Xây dựng truy vấn SQL để cập nhật dòng dựa trên email
+    update_query = f'''UPDATE basic_login_register
+                      SET username = ?,
+                          password = ?
+                      WHERE email = ?'''
+    
+    # Thực thi truy vấn với các giá trị thay thế
+    cursor.execute(update_query, (new_username, new_password, email))
+    
+    # Lưu thay đổi và đóng kết nối
+    conn.commit()
+    conn.close()
+
 # a = query_database_for_login_register_by_name(name="abc")
 # print(a)
-delete_data_for_login_and_register_by_name(name="quyet12306")
+# delete_data_for_login_and_register_by_name(name="quyet12306")
 for i in range(10):
     a = query_database_for_login_register_by_id(i)
     print(a)

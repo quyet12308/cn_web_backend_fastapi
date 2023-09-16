@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
-from login_register_database import query_database_for_login_register_by_name,save_data_for_login_register_in_table,query_database_for_login_register_by_email
+from login_register_database import query_database_for_login_register_by_name,save_data_for_login_register_in_table,query_database_for_login_register_by_email,update_user_by_email
 from confirm_email_registration import send_email_confirm_registration
+from forgot_password_mail import send_email_forgot_password
 from get_code import generate_random_6_digit_number
 from catcha_code_for_send_email import delayed_delete_confirm_code_by_email,query_database_for_confirm_code_by_email,save_data_for_confirm_code_in_table,query_data_by_email_with_max_id
 
@@ -90,15 +91,94 @@ class Data(BaseModel):
 #     else:
 #         return {"response": "Lỗi"}
     
-# forgot password
-@app.post("/api/forgot_password")
-async def login_register(request_data: dict):
+#login 
+@app.post("/api/login_basic")
+async def login_basic(request_data: dict):
     if request_data:
-        pass
+        name_user = request_data["name"]
+        password = request_data['pass']
+        login_check = query_database_for_login_register_by_name(name=name_user)
+        if login_check:
+            id1_,name1 , email1 , password1, createdtime1 = login_check
+            if password == password1:
+                return {"response":{
+                    "message":responses["dang_nhap_thanh_cong"],
+                    "status":True
+                }}
+            else:
+                return {"response":{
+                    "message":responses["sai_mat_khau"],
+                    "status":False
+                }}
+        else:
+            return {"response":{
+                    "message":responses["tai_khoan_chua_duoc_dang_ky"],
+                    "status":False
+                }}
 
-# async def delete_confirm_code_by_email_after_(email,minute):
-#     await delayed_delete_confirm_code_by_email(email=email,delay_minutes=minute)
+        
 
+
+# forgot password
+@app.post("/api/forgot_password_basic")
+async def forgot_password_basic(request_data: dict):
+    if request_data:
+        email = request_data["email"]
+        password = request_data["pass"]
+
+        time_now = gettime2()
+        check_email = query_database_for_login_register_by_email(email=email)
+
+        if check_email :
+            code = generate_random_6_digit_number()
+            id_, name_,email_, password_,createdtime_ = check_email
+            save_data_for_confirm_code_in_table(email=email,code=code,createdTime=time_now,username=name_)
+            send_email_forgot_password(code=code,password=passwords["outlook"],to_email=email,username=name_)
+            return {"response":{
+                    "message":responses["check_email_to_get_code"],
+                    "status":True
+                }}
+            
+        else:
+            return {"response":{
+                    "message":responses["email_chua_duoc_dang_ky"],
+                    "status":False
+                }}
+@app.post("/api/forgot_password_confirm_code_email")
+async def forgot_password_confirm_code_email(request_data: dict):
+    if request_data:
+        new_password = request_data['pass']
+        email = request_data['email']
+        code = request_data['code']
+
+        time_now = gettime2()
+        print(f"time now {time_now}")
+        print(type(time_now))
+        #get code from catcha ( sqlite delete after 3 minutes)
+        check_code = query_data_by_email_with_max_id(email=email)
+        id1 , username1,email1,createdTime1 ,code1 = check_code
+        print(f"created time = {createdTime1}")
+        if check_code:
+            check_time = check_time_range(now_time=time_now,created_time=createdTime1,minute=3)#true nếu tạo và truy cập trong khoảng 3 phút
+            if check_time:
+                if code1 == code:
+                    update_user_by_email(email=email,new_password=new_password,new_username=username1)
+                    return {"response":{
+                        "message":responses["cap_nhat_mat_khau_moi_thanh_cong"],
+                        "status":True
+                    }}
+                else:
+                    return {"response":{
+                        "message":responses["sai_code"],
+                        "status":False
+                    }}
+            else:
+                return {"response":{
+                        "message":responses["code_bi_qua_thoi_gian"],
+                        "status":False
+                    }}
+
+# register
 @app.post("/api/register_basic")
 async def register_basic(request_data: dict):
     if request_data:
@@ -138,7 +218,6 @@ async def register_basic(request_data: dict):
 @app.post("/api/register_confirm_code_email")
 async def register_confirm_code_email(request_data: dict):
     if request_data:
-        name = request_data['name']
         password = request_data['pass']
         email = request_data['email']
         code = request_data['code']
@@ -155,14 +234,14 @@ async def register_confirm_code_email(request_data: dict):
             check_time = check_time_range(now_time=time_now,created_time=createdTime1,minute=3)#true nếu tạo và truy cập trong khoảng 3 phút
             if check_time:
                 if code1 == code:
-                    save_data_for_login_register_in_table(createdTime=time_now,email=email,password=password,username=name)
+                    save_data_for_login_register_in_table(createdTime=time_now,email=email,password=password,username=username1)
                     return {"response":{
                         "message":responses["dang_ky_thanh_cong"],
                         "status":True
                     }}
                 else:
                     return {"response":{
-                        "message":responses["dang_ky_that_bai"],
+                        "message":responses["sai_code"],
                         "status":False
                     }}
             else:
