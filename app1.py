@@ -6,15 +6,19 @@ from pydantic import BaseModel
 
 
 from login_register_database import query_database_for_login_register_by_name,save_data_for_login_register_in_table,query_database_for_login_register_by_email,update_user_by_email
-from confirm_email_registration import send_email_confirm_registration
-from forgot_password_mail import send_email_forgot_password
+
 from get_code import generate_random_6_digit_number
 from catcha_code_for_send_email import delayed_delete_confirm_code_by_email,query_database_for_confirm_code_by_email,save_data_for_confirm_code_in_table,query_data_by_email_with_max_id
 
 from security_info import emails,passwords,urls
 from string_python_en import responses
 
+from contact_database import query_data_for_contact_in_table_by_email,save_data_for_contact_in_table
+
+from send_emails import send_email_confirm_registration,send_email_forgot_password,send_email_reminder_admin_about_contact_customer
+
 from gettime import gettime2,check_time_range
+from get_token import generate_random_token_string
 app = FastAPI()
 
 # Cấu hình CORS
@@ -33,77 +37,21 @@ class Data(BaseModel):
     islogin:bool
 
 
-
-# @app.post("/api/login_register")
-# async def login_register(request_data: dict):
-#     # Kiểm tra xem yêu cầu POST có dữ liệu không
-#     if request_data:
-#         # print(f"data = {request_data} type data = {type(request_data)}")
-#         # Truy cập các phần riêng lẻ bằng cách sử dụng khóa
-#         name = request_data['name']
-#         password = request_data['pass']
-#         email = request_data['email']
-#         is_login = request_data['islogin']
-#         # đăng nhập
-#         if is_login:
-#             # kiểm tra tài khoản tồn tại chưa . None nếu chưa tồn tại
-#             data1 = query_database_for_login_register_by_name(name=name)
-#             if data1 :
-#                 id1 ,username1 ,  email1,password1,createdtime1 = data1
-#                 print(f"user = {username1}, id = {id1} ,email = {email1}, password = {password1} , createdtime = {createdtime1}")
-#                 if password == password1:
-                    
-#                     return {"response":{
-#                         "message":"đăng nhập thành công",
-#                         "status":True,
-#                         "username":username1
-
-#                     }}
-#                 else:
-#                     return {"response":{
-#                         "message":"sai mật khẩu",
-#                         "status":False
-#                     }}
-#             else:
-#                 return {"response":{
-#                     "message":"chưa có tài khoản",
-#                         "status":False
-                    
-#                 }}
-#         # đăng ký
-#         else:
-#             data1 = query_database_for_login_register_by_name(name=name)
-#             if data1 :
-#                 return {"response":{
-#                     "message":"user đã tồn tại",
-#                     "status":False
-#                 }}
-#             else:
-#                 send_email_confirm_registration(code=generate_random_6_digit_number(),password=passwords["outlook"],to_email=email)
-#                 # save_data_for_login_register_in_table(username=name,email=email,password=password,createdTime=gettime2())
-#                 # return {"response":{
-#                 #     "message":"tạo thành công",
-#                 #     "status":True
-#                 # }}
-                
-
-#         return {"response": "OK"}
-#     else:
-#         return {"response": "Lỗi"}
-    
-#login 
 @app.post("/api/login_basic")
 async def login_basic(request_data: dict):
     if request_data:
         name_user = request_data["name"]
         password = request_data['pass']
         login_check = query_database_for_login_register_by_name(name=name_user)
+        login_token = generate_random_token_string(length=12)
         if login_check:
             id1_,name1 , email1 , password1, createdtime1 = login_check
             if password == password1:
                 return {"response":{
                     "message":responses["dang_nhap_thanh_cong"],
-                    "status":True
+                    "status":True,
+                    "token":login_token,
+                    "email":email1
                 }}
             else:
                 return {"response":{
@@ -250,6 +198,23 @@ async def register_confirm_code_email(request_data: dict):
                         "status":False
                     }}
 
+@app.post("/api/contact_basic")
+async def contact_basic(request_data: dict):
+    if request_data:
+        name = request_data['name']
+        subject = request_data['subject']
+        email = request_data['email']
+        message = request_data['message']
+
+        tim_now = gettime2()
+
+        save_data_for_contact_in_table(createdTime=tim_now,email=email,username=name,message=message,subject=subject)
+        send_email_reminder_admin_about_contact_customer(username=name,created_time=tim_now,password=passwords["outlook"],to_email=emails["email_admin"])
+        return {"response":{
+                        "message":responses["cam_on_dong_gop_cua_ban"],
+                        "status":True
+                    }}
+    
 
         
 
