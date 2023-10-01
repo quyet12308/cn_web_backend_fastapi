@@ -19,6 +19,15 @@ from send_emails import send_email_confirm_registration,send_email_forgot_passwo
 
 from gettime import gettime2,check_time_range
 from get_token import generate_random_token_string
+
+from home_screen_database import query_database_for_tourist_destination_information_by_id,get_all_data_from_table,save_data_in_table_tourist_destination_information,query_database_for_type_file_img_by_id,query_database_for_tourist_destination_information_by_name
+
+from check_database import get_max_id_from_table
+
+from base import random_number,random_3_numbers
+
+# from .router_home import 
+
 app = FastAPI()
 
 # Cấu hình CORS
@@ -214,7 +223,99 @@ async def contact_basic(request_data: dict):
                         "message":responses["cam_on_dong_gop_cua_ban"],
                         "status":True
                     }}
-    
+
+#test api to get img
+@app.get("/api/test_to_get_img")
+async def test_get_img():
+    max_id = get_max_id_from_table(path_of_database='database\\tourist_destination_information.db',table_name="type_of_file_img")
+    randum_num = random_number(end=max_id,start=1)
+    ttestdata =  query_database_for_tourist_destination_information_by_id(randum_num)
+    testdata2 = query_database_for_type_file_img_by_id(randum_num)
+    id_ , name_ , type_file_ = testdata2
+    id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = ttestdata
+    return {
+        "response":{
+            "url_img":img_base64,
+            "name":tourist_destination_name,
+            "type_file": type_file_,
+            "describe":tourist_destination_describe
+        }
+    }
+
+@app.get("/api/get_tourist_destination_information")
+async def get_tourist_destination_information():
+    tourist_destination_name_arr = []
+    img_base64_arr = []
+    price_arr = []
+    the_right_time_to_go_arr = []
+    tourist_destination_describe_arr = []
+    tourist_destination_location_arr = []
+    number_of_stars_arr = []
+    number_of_travel_days_arr = []
+    type_file_arr = []
+    max_id = get_max_id_from_table(path_of_database='database\\tourist_destination_information.db',table_name="type_of_file_img")
+    random_num_list = random_3_numbers(end=max_id,start=1)
+    for i in range(3):
+
+        # max_id = get_max_id_from_table(path_of_database='database\\tourist_destination_information.db',table_name="type_of_file_img")
+        # randum_num = random_number(end=max_id,start=1)
+        ttestdata =  query_database_for_tourist_destination_information_by_id(random_num_list[i])
+        testdata2 = query_database_for_type_file_img_by_id(random_num_list[i])
+        id_ , name_ , type_file_ = testdata2
+        id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = ttestdata
+        
+        tourist_destination_name_arr.append(tourist_destination_name)
+        img_base64_arr.append(img_base64)
+        price_arr.append(price)
+        the_right_time_to_go_arr.append(the_right_time_to_go)
+        tourist_destination_describe_arr.append(tourist_destination_describe)
+        tourist_destination_location_arr.append(tourist_destination_location)
+        number_of_stars_arr.append(number_of_stars)
+        number_of_travel_days_arr.append(number_of_travel_days)
+        type_file_arr.append(type_file_)
+
+        
+    return {
+            "response":{
+                "tourist_destination_name_arr":tourist_destination_name_arr,
+                "img_base64_arr":img_base64_arr,
+                "price_arr": price_arr,
+                "the_right_time_to_go_arr":the_right_time_to_go_arr,
+                "tourist_destination_describe_arr":tourist_destination_describe_arr,
+                "tourist_destination_location_arr":tourist_destination_location_arr,
+                "number_of_stars_arr":number_of_stars_arr,
+                "number_of_travel_days_arr":number_of_travel_days_arr,
+                "type_file_arr":type_file_arr
+            }
+        }
+
+@app.post("/api/get_tourist_destination_information_by_name")
+async def get_tourist_destination_information_by_name(request_data: dict):
+    if request_data:
+        name_ = request_data["name_"]
+        token = request_data["token_"]
+        # get_all_data_from_table()
+        data_ = query_database_for_tourist_destination_information_by_name(name=name_)
+        id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = data_
+        return {
+            "response":{
+                "status":True,
+                'message':{
+                    "tourist_destination_name":tourist_destination_name,
+                    "img_base64":img_base64,
+                    "price": price,
+                    "the_right_time_to_go":the_right_time_to_go,
+                    "tourist_destination_describe":tourist_destination_describe,
+                    "tourist_destination_location":tourist_destination_location,
+                    "number_of_stars":number_of_stars,
+                    "number_of_travel_days":number_of_travel_days
+                }
+                
+            }
+        }
+
+        
+
 
         
 
