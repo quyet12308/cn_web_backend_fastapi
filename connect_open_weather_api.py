@@ -1,7 +1,7 @@
 import requests
 import random
 from base_code.security_info import api_key
-from base_code.base import cover_kelvin_to_c
+from base_code.base import cover_kelvin_to_c,convert_time_to_period
 
 api_key = api_key["openweather"]  # Thay YOUR_API_KEY bằng API key bạn đã lấy từ OpenWeather
 city = "hanoi"  # Thay Hanoi bằng tên thành phố bạn muốn lấy thông tin thời tiết
@@ -65,7 +65,7 @@ def select_data_of_weather_data(weather_data_dict):
     weather = weather_data_dict["weather"]
     visibility = weather_data_dict["visibility"]
     pop = round(weather_data_dict["pop"]*100,1)
-    dt_txt = weather_data_dict["dt_txt"]
+    dt_txt = convert_time_to_period(time_str=weather_data_dict["dt_txt"])
     dt_day_txt = dt_txt[:10]
 
     temp = round(cover_kelvin_to_c(kelvin=main["temp"]),1)

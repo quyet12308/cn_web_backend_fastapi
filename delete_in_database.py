@@ -1,6 +1,7 @@
 
 
 import sqlite3
+from base_code.gettime import gettime3
 
 def delete_table_in_database(database_name,table_name,enforcement_rights):
     if enforcement_rights == "admin":
@@ -25,3 +26,5 @@ def delete_table_in_database(database_name,table_name,enforcement_rights):
         print("you dont have a enforcement rights")
 
 # delete_table_in_database(database_name="booking_tour",enforcement_rights="admin",table_name="booking_tour_basic")
+# delete_table_in_database(database_name="visual_hotels_and_restaurent",enforcement_rights="admin",table_name=f"visual_hotels_and_restaurent_{gettime3()}")
+# delete_table_in_database(database_name="offer",enforcement_rights="admin",table_name=f"offer_basic")

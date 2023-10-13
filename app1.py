@@ -17,17 +17,22 @@ from contact_database import query_data_for_contact_in_table_by_email,save_data_
 
 from email_with_python.send_emails import send_email_confirm_registration,send_email_forgot_password,send_email_reminder_admin_about_contact_customer
 
-from base_code.gettime import gettime2,check_time_range
+from base_code.gettime import gettime2,check_time_range,gettime3
 from base_code.get_token import generate_random_token_string
 
 from home_screen_database import query_database_for_tourist_destination_information_by_id,get_all_data_from_table,save_data_in_table_tourist_destination_information,query_database_for_type_file_img_by_id,query_database_for_tourist_destination_information_by_name
 
-from check_database import get_max_id_from_table
+from check_database import get_max_id_from_table,check_table_existence
 
 from base_code.base import random_number,random_3_numbers
 
 from connect_open_weather_api import get_5_datas_from_5_day_weather
 
+from book_hotel_restaurant_database import create_database_for_visual_hotels_and_restaurent_basic1,query_database_for_visual_hotels_and_restaurent_by_tourist_destination_name,save_data_for_visual_hotels_and_restaurent_in_table
+
+from connect_api_travel import get_data_hotel_from_api_rapidapi
+
+from offers_database import query_database_for_offer_by_id_hotel
 # from .router_home import 
 
 app = FastAPI()
@@ -47,7 +52,7 @@ class Data(BaseModel):
     email:str
     islogin:bool
 
-
+# login 
 @app.post("/api/login_basic")
 async def login_basic(request_data: dict):
     if request_data:
@@ -82,7 +87,7 @@ async def login_basic(request_data: dict):
         
 
 
-# forgot password
+# forgot password 
 @app.post("/api/forgot_password_basic")
 async def forgot_password_basic(request_data: dict):
     if request_data:
@@ -108,6 +113,8 @@ async def forgot_password_basic(request_data: dict):
                     "message":responses["email_chua_duoc_dang_ky"],
                     "status":False
                 }}
+        
+# xác nhận code khi forgot password
 @app.post("/api/forgot_password_confirm_code_email")
 async def forgot_password_confirm_code_email(request_data: dict):
     if request_data:
@@ -180,6 +187,7 @@ async def register_basic(request_data: dict):
                     "status":False
                 }}
 
+# xác nhận code khi register
 @app.post("/api/register_confirm_code_email")
 async def register_confirm_code_email(request_data: dict):
     if request_data:
@@ -215,6 +223,7 @@ async def register_confirm_code_email(request_data: dict):
                         "status":False
                     }}
 
+# contact
 @app.post("/api/contact_basic")
 async def contact_basic(request_data: dict):
     if request_data:
@@ -250,8 +259,28 @@ async def test_get_img():
         }
     }
 
+# hiển thị tour trên trang chính
 @app.get("/api/get_tourist_destination_information")
 async def get_tourist_destination_information():
+    # update dữ liệu hotel 
+    # gettime3 = gettime3()
+    # check_data_hotel_is_upadate_for_today = check_table_existence(database_name="database\\visual_hotels_and_restaurent.db",table_name=f"visual_hotels_and_restaurent_{gettime3()}")
+    # if check_data_hotel_is_upadate_for_today :
+    #     print("data hotel is update")
+    # else:
+    #     create_database_for_visual_hotels_and_restaurent_basic1(day=gettime3(),tablename="visual_hotels_and_restaurent")
+    #     max_id = get_max_id_from_table(path_of_database="database\\tourist_destination_information.db",table_name="tourist_destination_information_basic_for_get_data2")
+    #     for i in range(1,max_id + 1):
+    #         data6 = query_database_for_tourist_destination_information_by_id(id=i)
+    #         data6_tourist_destination_name = data6["tourist_destination_name"]
+    #         data6_lat = data6["lat"]
+    #         data6_lon = data6["lon"]
+    #         result = str(get_data_hotel_from_api_rapidapi(lon=data6_lon,lat=data6_lat))
+    #         save_data_for_visual_hotels_and_restaurent_in_table(createdTime=gettime2(),data=result,lat=data6_lat,lon=data6_lon,tourist_destination_name=data6_tourist_destination_name,table_name=f"visual_hotels_and_restaurent_{gettime3()}")
+
+
+
+
     tourist_destination_name_arr = []
     img_base64_arr = []
     price_arr = []
@@ -306,6 +335,7 @@ async def get_tourist_destination_information():
             }
         }
 
+# hiện thông tin tour chi tiết 
 @app.post("/api/get_tourist_destination_information_by_name")
 async def tourist_destination_information_by_name(request_data: dict):
     if request_data:
@@ -346,6 +376,7 @@ async def tourist_destination_information_by_name(request_data: dict):
             }
         }
 
+# hiện thông tin người dùng 
 @app.post("/api/get_user_infor")
 async def get_user_infor(request_data: dict):
     if request_data:
@@ -388,7 +419,7 @@ async def get_user_infor(request_data: dict):
                 
             }
         }
-    
+# sửa thông tin người dùng
 @app.post("/api/edit_user_infor")
 async def edit_user_infor(request_data: dict):
     if request_data:
@@ -429,7 +460,77 @@ async def edit_user_infor(request_data: dict):
                     "status":False
                 }}
             
-            
+@app.post("/api/get_offer_data")
+async def get_offer_data(request_data: dict):
+    max_id = get_max_id_from_table(path_of_database="database\offer.db",table_name="offer_basic")
+    if request_data:
+        # print(request_data)
+        if request_data["default"] == "yes":
+            id_hotel_1_list = []
+            hotel_name_1_list = []
+            stars_1_list = []
+            price_1_list = []
+            num_reviews_1_list = []
+            avata_img_1_list = []
+            describe_hotel_1_list = []
+
+            for i in range(1,max_id):
+                data1 = query_database_for_offer_by_id_hotel(id_hotel=1000+i)
+                id_hotel_1 = data1["id_hotel"]
+                hotel_name_1 = data1["hotel_name"]
+                stars_1 = data1["stars"]
+                price_1 = data1["price"]
+                num_reviews_1 = data1["num_reviews"]
+                avata_img_1 = data1["avata_img"]
+                describe_hotel_1 = data1["describe_hotel"]
+                id_hotel_1_list.append(id_hotel_1)
+                hotel_name_1_list.append(hotel_name_1)
+                stars_1_list.append(stars_1)
+                price_1_list.append(price_1)
+                num_reviews_1_list.append(num_reviews_1)
+                avata_img_1_list.append(avata_img_1)
+                describe_hotel_1_list.append(describe_hotel_1)
+            return {
+            "response":{
+                "status":True,
+                'message':{
+                    "id_hotel":id_hotel_1_list,
+                    "hotel_name":hotel_name_1_list,
+                    "stars": stars_1_list,
+                    "price":price_1_list,
+                    "num_reviews":num_reviews_1_list,
+                    "avata_img":avata_img_1_list,
+                    "describe_hotel":describe_hotel_1_list
+                }
+                
+            }
+        }  
+
+        default = request_data["default"]
+        price_offer = request_data["price_offer"]
+        location_offer = request_data["location_offer"]
+        star_offer = request_data["star_offer"]
+        distance_offer = request_data["distance_offer"]
+        review_offer = request_data["review_offer"]
+        
+        # if 
+
+        # save_data_for_contact_in_table(createdTime=tim_now,email=email,username=name,message=message,subject=subject)
+        # send_email_reminder_admin_about_contact_customer(username=name,created_time=tim_now,password=passwords["outlook"],to_email=emails["email_admin"])
+        # return {
+        #     "response":{
+        #         "status":True,
+        #         'message':{
+        #             "username":username2_,
+        #             "avatar_img":avatar_img2_,
+        #             "birthday": birthday2_,
+        #             "email":email2_,
+        #             "password":password2_,
+        #             "createdTime":createdTime2_
+        #         }
+                
+        #     }
+        # }      
 
     
 
@@ -437,7 +538,7 @@ async def edit_user_infor(request_data: dict):
         
 
         
-
+# nơi khởi chạy
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app1:app", port=8080, workers=5, reload=True)

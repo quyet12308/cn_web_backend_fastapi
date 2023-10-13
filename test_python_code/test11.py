@@ -7,21 +7,72 @@ keys = data.keys()
 
 keys_data = ['data', 'restaurant_availability_options', 'open_hours_options', 'paging']
 
-# print(data['data'])
-print(type(data['data']))
 
-print(len(data['data']))
+
+# data 
+
+# print(data['data'])
+# print(type(data['data']))
+
+# print(len(data['data']))
 
 # print(data['data'][0])
-print(type(data['data'][0]))
-# print(type(data['data'][0].keys()))
-dict_data = data['data'][0]
+# print(type(data['data'][0]))
+# # print(type(data['data'][0].keys()))
+# dict_data = data['data'][0]
 
-print(len(dict_data))
+# print(len(dict_data))
 
-print(dict_data.keys())
+# print(dict_data.keys())
 
 keys_in_data_data = ['location_id', 'name', 'latitude', 'longitude', 'num_reviews', 'timezone', 'location_string', 'photo', 'awards', 'doubleclick_zone', 'preferred_map_engine', 'raw_ranking', 'ranking_geo', 'ranking_geo_id', 'ranking_position', 'ranking_denominator', 'ranking_category', 'ranking', 'distance', 'distance_string', 'bearing', 'rating', 'is_closed', 'open_now_text', 'is_long_closed', 'price_level', 'description', 'web_url', 'write_review', 'ancestors', 'category', 'subcategory', 'parent_display_name', 'is_jfy_enabled', 'nearest_metro_station', 'reviews', 'phone', 'website', 'address_obj', 'address', 'hours', 'is_candidate_for_contact_info_suppression', 'cuisine', 'dietary_restrictions', 'establishment_types']
 
-for key in dict_data:
-    print(dict_data[key])
+# for key in dict_data:
+#     print(dict_data[key])
+
+
+# restaurant_availability_options
+
+restaurant_availability_options = data["restaurant_availability_options"]
+# print(restaurant_availability_options)
+# print("-----------------------------")
+# print(restaurant_availability_options.keys())
+
+
+# open_hours_options
+open_hours_options = data['open_hours_options']
+# print(open_hours_options)
+# print(type(open_hours_options))
+# print(len(open_hours_options))
+
+# print(len(data["restaurant_availability_options"]))
+
+# print(type(data["restaurant_availability_options"]))
+
+# print(data["restaurant_availability_options"])
+
+paging = data['paging']
+
+data_in_data = data['data']
+
+data_test = [paging,data_in_data,open_hours_options,restaurant_availability_options]
+
+# for i in keys_data:
+#     print(i)
+#     print(len(data[i]))
+#     print(type(data[i]))
+#     a = data[i]
+
+# print(data_in_data[0])
+# print("--------------------")
+# print(data_in_data[0]["photo"])
+
+data2_test = {'images': {'small': {'width': '150', 'url': 'https://media-cdn.tripadvisor.com/media/photo-l/0e/65/c0/cf/ma-der-la-by-phuthai.jpg', 'height': '150'}, 'thumbnail': {'width': '50', 'url': 'https://media-cdn.tripadvisor.com/media/photo-t/0e/65/c0/cf/ma-der-la-by-phuthai.jpg', 'height': '50'}, 'original': {'width': '1500', 'url': 'https://media-cdn.tripadvisor.com/media/photo-o/0e/65/c0/cf/ma-der-la-by-phuthai.jpg', 'height': '1002'}, 'large': {'width': '1024', 'url': 'https://media-cdn.tripadvisor.com/media/photo-w/0e/65/c0/cf/ma-der-la-by-phuthai.jpg', 'height': '684'}, 'medium': {'width': '550', 'url': 'https://media-cdn.tripadvisor.com/media/photo-s/0e/65/c0/cf/ma-der-la-by-phuthai.jpg', 'height': '367'}}, 'is_blessed': True, 'uploaded_date': '2017-02-11T03:01:27-0500', 'caption': 'Ma Der La by Phuthai kaiyang1971 (Pattaya Branch)', 'id': '241549519', 'helpful_votes': '0', 'published_date': '2017-02-11T03:01:27-0500', 'user': {'user_id': None, 'member_id': '0', 'type': 'user'}}
+
+
+# for i in keys_in_data_data:
+#     print(f"{i} = {data_in_data[0][i]}")
+#     print("================================================================")
+
+# print(data2_test.keys())
+print(data2_test['images'].keys())

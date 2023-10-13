@@ -1,4 +1,5 @@
 import sqlite3
+from base_code.gettime import gettime3
 
 def check_table_in_database(path_to_database):
     # Kết nối đến CSDL SQLite
@@ -69,6 +70,27 @@ def get_max_id_from_table(path_of_database,table_name):
 # print(structure_of_the_table(path_to_database="database\\tourist_destination_information.db",table_name="tourist_destination_information_basic_for_get_data"))
 
 
-# a = structure_of_the_table(path_to_database="database\\tourist_destination_information.db",table_name="tourist_destination_information_basic_for_get_data")
+# a = structure_of_the_table(path_to_database="database\offer.db",table_name="offer_basic")
 
 # print(a)
+
+def check_table_existence(database_name, table_name):
+    # Kết nối đến cơ sở dữ liệu
+    conn = sqlite3.connect(database_name)
+    cursor = conn.cursor()
+
+    # Kiểm tra xem bảng có tồn tại hay không
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+    table_exists = cursor.fetchone() is not None
+
+    # Đóng kết nối và trả về kết quả kiểm tra
+    cursor.close()
+    conn.close()
+    return table_exists
+
+# max_id = get_max_id_from_table(path_of_database="database\\tourist_destination_information.db",table_name="tourist_destination_information_basic_for_get_data2")
+# print(max_id)
+# print(check_table_existence(database_name="database\\visual_hotels_and_restaurent.db",table_name=f"visual_hotels_and_restaurent_{gettime3()}"))
+
+# max_id = get_max_id_from_table(path_of_database="database\offer.db",table_name="offer_basic")
+# print(max_id)

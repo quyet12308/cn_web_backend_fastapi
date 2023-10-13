@@ -12,6 +12,12 @@ def gettime2():
     t = local_time.strftime("%Y-%m-%d %H:%M:%S")
     return t
 
+def gettime3():
+    utc_time = datetime.datetime.now(pytz.utc)
+    local_time = utc_time.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
+    t = local_time.strftime("%Y_%m_%d")
+    return t
+
 
 
 def check_time_range(created_time, now_time, minute):
@@ -38,3 +44,4 @@ def check_time_range(created_time, now_time, minute):
 # result = check_time_range(created_time, now_time, minute)
 # print(result)  # True nếu khoảng thời gian không vượt qua tham số minute, False nếu vượt qua
 
+# print(gettime3())
