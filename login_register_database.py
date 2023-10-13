@@ -1,4 +1,27 @@
 import sqlite3
+from base_code.cover_base_64_img import convert_image_to_base64
+
+
+def create_database_for_login_register_basic2(tablename):
+    
+    # Kết nối tới cơ sở dữ liệu (hoặc tạo mới nếu chưa tồn tại)
+    conn = sqlite3.connect('database/login_register.db')
+
+    # Tạo một đối tượng cursor để thực thi truy vấn
+    cursor = conn.cursor()
+    
+        # Tạo bảng diseases
+    cursor.execute(f'''CREATE TABLE {tablename}
+                  (id INTEGER PRIMARY KEY,
+                   username TEXT,
+                   email TEXT,
+                   password TEXT,
+                   birthday TEXT,
+                   avata_img TEXT,
+                   createdTime TEXT)''')
+    # Lưu thay đổi và đóng kết nối
+    conn.commit()
+    conn.close()
 
 def create_database_for_login_register_basic(tablename):
     
@@ -19,21 +42,43 @@ def create_database_for_login_register_basic(tablename):
     conn.commit()
     conn.close()
 
-# create_database_for_login_register_basic(tablename='basic_login_register')
 
-def query_database_for_login_register_by_name( name):
+# create_database_for_login_register_basic2(tablename='basic_login_register2')
+
+# def query_database_for_login_register_by_name( name):
+#     # Kết nối tới cơ sở dữ liệu
+#     conn = sqlite3.connect('database/login_register.db')
+#     cursor = conn.cursor()
+
+#     # Thực hiện truy vấn dữ liệu từ bảng
+#     # chuyển dữ liệu qua bảng mới basic_login_register2
+#     cursor.execute(f"SELECT * FROM basic_login_register2 WHERE username=?", (name,))
+#     data = cursor.fetchone()
+
+#     # Đóng kết nối
+#     conn.close()
+
+#     return data
+
+def query_database_for_login_register_by_name(name):
     # Kết nối tới cơ sở dữ liệu
     conn = sqlite3.connect('database/login_register.db')
     cursor = conn.cursor()
 
     # Thực hiện truy vấn dữ liệu từ bảng
-    cursor.execute(f"SELECT * FROM basic_login_register WHERE username=?", (name,))
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    cursor.execute(f"SELECT * FROM basic_login_register2 WHERE username=?", (name,))
     data = cursor.fetchone()
 
     # Đóng kết nối
     conn.close()
 
-    return data
+    if data:
+        columns = ['id', 'username', 'email', 'password','birthday' ,'avata_img', 'createdTime']
+        data_dict = dict(zip(columns, data))
+        return data_dict
+    else:
+        return None
 
 def query_database_for_login_register_by_id( id):
     # Kết nối tới cơ sở dữ liệu
@@ -41,7 +86,8 @@ def query_database_for_login_register_by_id( id):
     cursor = conn.cursor()
 
     # Thực hiện truy vấn dữ liệu từ bảng
-    cursor.execute(f"SELECT * FROM basic_login_register WHERE id=?", (id,))
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    cursor.execute(f"SELECT * FROM basic_login_register2 WHERE id=?", (id,))
     data = cursor.fetchone()
 
     # Đóng kết nối
@@ -55,13 +101,20 @@ def query_database_for_login_register_by_email( email):
     cursor = conn.cursor()
 
     # Thực hiện truy vấn dữ liệu từ bảng
-    cursor.execute(f"SELECT * FROM basic_login_register WHERE email=?", (email,))
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    cursor.execute(f"SELECT * FROM basic_login_register2 WHERE email=?", (email,))
     data = cursor.fetchone()
 
     # Đóng kết nối
     conn.close()
+    if data:
+        columns = ['id', 'username', 'email', 'password','birthday' ,'avata_img', 'createdTime']
+        data_dict = dict(zip(columns, data))
+        return data_dict
+    else:
+        return None
 
-    return data
+    
 
 # lưu dữ liệu 
 def save_data_for_login_register_in_table( username, password,email,createdTime ):
@@ -70,12 +123,17 @@ def save_data_for_login_register_in_table( username, password,email,createdTime 
     cursor = conn.cursor()
 
     # Thêm dữ liệu vào bảng diseases
-    cursor.execute(f"INSERT INTO basic_login_register (username, password,email ,createdTime) VALUES (?,?,?,?)",
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    # if birthday is None and avata_img is None:
+    #     birthday = avata_img == ""
+    cursor.execute(f"INSERT INTO basic_login_register2 (username, password,email,createdTime) VALUES (?,?,?,?)",
                (username, password,email,createdTime))
 
     # Lưu thay đổi và đóng kết nối
     conn.commit()
     conn.close()
+
+
 
 #delete
 def delete_data_for_login_and_register_by_name(name):
@@ -87,25 +145,43 @@ def delete_data_for_login_and_register_by_name(name):
     cursor = conn.cursor()
 
     # Xóa dữ liệu từ bảng test dựa trên tên
-    cursor.execute("DELETE FROM basic_login_register WHERE username=?", (name,))
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    cursor.execute("DELETE FROM basic_login_register2 WHERE username=?", (name,))
 
     # Lưu thay đổi và đóng kết nối
     conn.commit()
     conn.close()
 
-def update_user_by_email(email, new_username, new_password):
+# def update_user_by_email(email, new_username, new_password):
+#     # Kết nối tới cơ sở dữ liệu
+#     conn = sqlite3.connect('database/login_register.db')
+#     cursor = conn.cursor()
+    
+#     # Xây dựng truy vấn SQL để cập nhật dòng dựa trên email
+#     # chuyển dữ liệu qua bảng mới basic_login_register2
+#     update_query = f'''UPDATE basic_login_register2
+#                       SET username = ?,
+#                           password = ?
+#                       WHERE email = ?'''
+    
+#     # Thực thi truy vấn với các giá trị thay thế
+#     cursor.execute(update_query, (new_username, new_password, email))
+    
+#     # Lưu thay đổi và đóng kết nối
+#     conn.commit()
+#     conn.close()
+
+def update_user_by_email(email, column, value):
     # Kết nối tới cơ sở dữ liệu
     conn = sqlite3.connect('database/login_register.db')
     cursor = conn.cursor()
     
-    # Xây dựng truy vấn SQL để cập nhật dòng dựa trên email
-    update_query = f'''UPDATE basic_login_register
-                      SET username = ?,
-                          password = ?
-                      WHERE email = ?'''
+    # Xây dựng truy vấn SQL để cập nhật dòng dựa trên email và cột chỉ định
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    update_query = f"UPDATE basic_login_register2 SET {column} = ? WHERE email = ?"
     
     # Thực thi truy vấn với các giá trị thay thế
-    cursor.execute(update_query, (new_username, new_password, email))
+    cursor.execute(update_query, (value, email))
     
     # Lưu thay đổi và đóng kết nối
     conn.commit()

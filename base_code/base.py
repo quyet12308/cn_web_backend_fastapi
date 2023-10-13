@@ -16,3 +16,7 @@ def random_3_numbers(start, end):
     random_numbers = random.sample(number_list, 3)
 
     return random_numbers
+
+def cover_kelvin_to_c(kelvin):
+    c = kelvin - 273.15
+    return c

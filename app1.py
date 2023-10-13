@@ -7,24 +7,26 @@ from pydantic import BaseModel
 
 from login_register_database import query_database_for_login_register_by_name,save_data_for_login_register_in_table,query_database_for_login_register_by_email,update_user_by_email
 
-from get_code import generate_random_6_digit_number
+from base_code.get_code import generate_random_6_digit_number
 from catcha_code_for_send_email import delayed_delete_confirm_code_by_email,query_database_for_confirm_code_by_email,save_data_for_confirm_code_in_table,query_data_by_email_with_max_id
 
-from security_info import emails,passwords,urls
-from string_python_en import responses
+from base_code.security_info import emails,passwords,urls
+from base_code.string_python_en import responses
 
 from contact_database import query_data_for_contact_in_table_by_email,save_data_for_contact_in_table
 
-from send_emails import send_email_confirm_registration,send_email_forgot_password,send_email_reminder_admin_about_contact_customer
+from email_with_python.send_emails import send_email_confirm_registration,send_email_forgot_password,send_email_reminder_admin_about_contact_customer
 
-from gettime import gettime2,check_time_range
-from get_token import generate_random_token_string
+from base_code.gettime import gettime2,check_time_range
+from base_code.get_token import generate_random_token_string
 
 from home_screen_database import query_database_for_tourist_destination_information_by_id,get_all_data_from_table,save_data_in_table_tourist_destination_information,query_database_for_type_file_img_by_id,query_database_for_tourist_destination_information_by_name
 
 from check_database import get_max_id_from_table
 
-from base import random_number,random_3_numbers
+from base_code.base import random_number,random_3_numbers
+
+from connect_open_weather_api import get_5_datas_from_5_day_weather
 
 # from .router_home import 
 
@@ -54,13 +56,17 @@ async def login_basic(request_data: dict):
         login_check = query_database_for_login_register_by_name(name=name_user)
         login_token = generate_random_token_string(length=12)
         if login_check:
-            id1_,name1 , email1 , password1, createdtime1 = login_check
+            # id1_,name1 , email1 , password1, createdtime1 = login_check
+            password1 = login_check["password"]
+            email1 = login_check["email"]
+            avata_img1 = login_check["avata_img"]
             if password == password1:
                 return {"response":{
                     "message":responses["dang_nhap_thanh_cong"],
                     "status":True,
                     "token":login_token,
-                    "email":email1
+                    "email":email1,
+                    "avata_img":avata_img1
                 }}
             else:
                 return {"response":{
@@ -88,7 +94,8 @@ async def forgot_password_basic(request_data: dict):
 
         if check_email :
             code = generate_random_6_digit_number()
-            id_, name_,email_, password_,createdtime_ = check_email
+            # id_, name_,email_, password_,createdtime_ = check_email
+            name_ = check_email["username"]
             save_data_for_confirm_code_in_table(email=email,code=code,createdTime=time_now,username=name_)
             send_email_forgot_password(code=code,password=passwords["outlook"],to_email=email,username=name_)
             return {"response":{
@@ -119,7 +126,8 @@ async def forgot_password_confirm_code_email(request_data: dict):
             check_time = check_time_range(now_time=time_now,created_time=createdTime1,minute=3)#true nếu tạo và truy cập trong khoảng 3 phút
             if check_time:
                 if code1 == code:
-                    update_user_by_email(email=email,new_password=new_password,new_username=username1)
+                    update_user_by_email(column="password",email=email,value=new_password)
+                    # update_user_by_email(email=email,new_password=new_password,new_username=username1)
                     return {"response":{
                         "message":responses["cap_nhat_mat_khau_moi_thanh_cong"],
                         "status":True
@@ -262,8 +270,17 @@ async def get_tourist_destination_information():
         ttestdata =  query_database_for_tourist_destination_information_by_id(random_num_list[i])
         testdata2 = query_database_for_type_file_img_by_id(random_num_list[i])
         id_ , name_ , type_file_ = testdata2
-        id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = ttestdata
+        # id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = ttestdata
         
+        tourist_destination_name = ttestdata["tourist_destination_name"]
+        img_base64 = ttestdata["img_base64"]
+        price = ttestdata["price"]
+        the_right_time_to_go = ttestdata["the_right_time_to_go"]
+        tourist_destination_describe = ttestdata["tourist_destination_describe"]
+        tourist_destination_location = ttestdata["tourist_destination_location"]
+        number_of_stars = ttestdata["number_of_stars"]
+        number_of_travel_days = ttestdata["number_of_travel_days"]
+
         tourist_destination_name_arr.append(tourist_destination_name)
         img_base64_arr.append(img_base64)
         price_arr.append(price)
@@ -290,13 +307,27 @@ async def get_tourist_destination_information():
         }
 
 @app.post("/api/get_tourist_destination_information_by_name")
-async def get_tourist_destination_information_by_name(request_data: dict):
+async def tourist_destination_information_by_name(request_data: dict):
     if request_data:
-        name_ = request_data["name_"]
-        token = request_data["token_"]
+        name_ = request_data["name"]
+        token = request_data["token"]
+        # print(name_)
         # get_all_data_from_table()
+        
         data_ = query_database_for_tourist_destination_information_by_name(name=name_)
-        id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = data_
+        # print(data_)
+        tourist_destination_name = data_["tourist_destination_name"]
+        img_base64 = data_["img_base64"]
+        price = data_["price"]
+        the_right_time_to_go = data_["the_right_time_to_go"]
+        tourist_destination_describe = data_["tourist_destination_describe"]
+        tourist_destination_location = data_["tourist_destination_location"]
+        number_of_stars = data_["number_of_stars"]
+        number_of_travel_days = data_["number_of_travel_days"]
+        lat = data_["lat"]
+        lon = data_["lon"]
+        five_day_weather_datas = get_5_datas_from_5_day_weather(lang="vi",lat=lat,lon=lon)
+        # id_ ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = data_
         return {
             "response":{
                 "status":True,
@@ -308,13 +339,99 @@ async def get_tourist_destination_information_by_name(request_data: dict):
                     "tourist_destination_describe":tourist_destination_describe,
                     "tourist_destination_location":tourist_destination_location,
                     "number_of_stars":number_of_stars,
-                    "number_of_travel_days":number_of_travel_days
+                    "number_of_travel_days":number_of_travel_days,
+                    "five_day_weather_datas":five_day_weather_datas
                 }
                 
             }
         }
 
+@app.post("/api/get_user_infor")
+async def get_user_infor(request_data: dict):
+    if request_data:
+        name = request_data["name"]
+        email = request_data["email"]
+
         
+        # # print(data1)
+        # if data1 is None:
+        #     id_ = username_ = email_ =  avatar_img_ = birthday_ = createdTime_ = ""
+        # else:
+        #     id_ , username_,email_, avatar_img_,birthday_,createdTime_ = data1
+        data2 = query_database_for_login_register_by_email(email=email)
+        # print(data2)
+        # id2_ ,username2_, email2_,password2_,createdTime2_ = data2
+        username2_ = data2['username'] 
+        avatar_img2_ = data2['avata_img']
+        # avatar_img2_ = data2.get("avatar_img")
+        birthday2_ = data2['birthday']
+        email2_ = data2['email']
+        password2_ = data2['password']
+        createdTime2_ = data2['createdTime']
+
+        # if avatar_img2_ is None :
+        #     avatar_img2_ = ""
+        # if birthday2_ is None:
+        #     birthday2_ = ""
+
+        return {
+            "response":{
+                "status":True,
+                'message':{
+                    "username":username2_,
+                    "avatar_img":avatar_img2_,
+                    "birthday": birthday2_,
+                    "email":email2_,
+                    "password":password2_,
+                    "createdTime":createdTime2_
+                }
+                
+            }
+        }
+    
+@app.post("/api/edit_user_infor")
+async def edit_user_infor(request_data: dict):
+    if request_data:
+        # print(request_data)
+        email_ = request_data["email"]
+        username_ = request_data["username"]
+        password_ = request_data["password"]
+        birthday_ = request_data["birthday"]
+        avatar_img_ = request_data["avatar_img"]
+
+        # print(username_)
+        # print(password_)
+        # print(birthday_)
+        # print(avatar_img_)
+
+        if email_:
+            check_email = query_database_for_login_register_by_email(email=email_)
+            if check_email :
+                check_username = query_database_for_login_register_by_name(name=username_)
+                update_user_by_email(column="birthday",email=email_,value=birthday_)
+                update_user_by_email(column="password",email=email_,value=password_)
+                update_user_by_email(column="avata_img",email=email_,value=avatar_img_)
+                if check_username:
+                    return {"response":{
+                    "message":responses["user_da_ton_tai"],
+                    "status":False
+                    }}
+                else:
+                    update_user_by_email(column="username",email=email_,value=username_)
+                    
+                    return {"response":{
+                        "message":responses["sua_thong_tin_thanh_cong"],
+                        "status":True
+                    }}
+            else:
+                return {"response":{
+                    "message":responses["email_chua_duoc_dang_ky"],
+                    "status":False
+                }}
+            
+            
+
+    
 
 
         

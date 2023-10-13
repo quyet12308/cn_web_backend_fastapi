@@ -31,7 +31,7 @@ def write_to_text_file(data, file_path):
     with open(file_path, 'w') as file:
         file.write(data)
 
-# a = convert_image_to_base64(image_path="img\mauritius-landscape.webp")
+# a = convert_image_to_base64(image_path="img\icon_persion.jpg")
 # # print(a)
 # write_to_text_file(data=a,file_path="test_data.txt")
 

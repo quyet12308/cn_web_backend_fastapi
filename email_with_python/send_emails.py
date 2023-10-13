@@ -1,6 +1,6 @@
 import smtplib
 import getpass
-from security_info import passwords ,emails
+from base_code.security_info import passwords ,emails
 
 def send_email_forgot_password(username,password, code, to_email):
     HOST = "smtp-mail.outlook.com"
@@ -88,7 +88,7 @@ def send_email_confirm_registration(username,password, code, to_email):
     HOST = "smtp-mail.outlook.com"
     PORT = 587
 
-    FROM_EMAIL = emails["outlook"]
+    FROM_EMAIL = emails["outlook1"]
 
     MESSAGE = f"""Subject: Send email from Nhom13
 
