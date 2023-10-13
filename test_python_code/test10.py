@@ -13,7 +13,7 @@
 # }
 # headers = {
 # 	"content-type": "application/json",
-# 	"X-RapidAPI-Key": "93d691634emsh06aece34ef9f62ap168b08jsn94ecdbe3a334",
+# 	"X-RapidAPI-Key": f"{api_key['X-RapidAPI-Key']}",
 # 	"X-RapidAPI-Host": "hotels4.p.rapidapi.com"
 # }
 
@@ -38,7 +38,7 @@
 #         "pageSize": "10"
 #     }
 #     headers = {
-#         "X-RapidAPI-Key": "93d691634emsh06aece34ef9f62ap168b08jsn94ecdbe3a334",
+#         "X-RapidAPI-Key": "",
 #         "X-RapidAPI-Host": "hotels-com-free.p.rapidapi.com"
 #     }
 
