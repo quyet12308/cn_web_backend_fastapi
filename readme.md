@@ -55,5 +55,7 @@
 #### File login_register_database.py chứa các hàm thao tác với database\login_register.db để sử lý các chức năng đăng ký , đăng nhập và quên mật khẩu .
 
 ### Mô tả chi tiết bằng biểu đồ
+
 ![Anh biểu đồ đăng ký](D:\cong_nghe_web\img_destination_information\Picture1.png)
 ![Anh biểu đồ đăng ký](Picture1.png)
+
