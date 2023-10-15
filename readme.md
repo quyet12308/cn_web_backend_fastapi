@@ -17,7 +17,8 @@
 ### Dự án backend công nghệ web fastapi sử dụng các công nghệ là : 
 
 #### front-end: html ,css , js
-#### back-end : fastapi , sqlite
+#### back-end : fastapi 
+#### database: sqlite
 
 ### Các chức năng chính đã hoàn thiện :
 
@@ -54,4 +55,5 @@
 #### File login_register_database.py chứa các hàm thao tác với database\login_register.db để sử lý các chức năng đăng ký , đăng nhập và quên mật khẩu .
 
 ### Mô tả chi tiết bằng biểu đồ
-![Anh biểu đồ đăng ký](img_destination_information/Picture1.png)
+![Anh biểu đồ đăng ký](D:\cong_nghe_web\img_destination_information\Picture1.png)
+![Anh biểu đồ đăng ký](Picture1.png)
