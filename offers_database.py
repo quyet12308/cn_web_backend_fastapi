@@ -48,6 +48,30 @@ def query_database_for_offer_by_id_hotel( id_hotel):
         return data_dict
     else:
         return None
+    
+def query_database_for_offer_by_id_hotel_order_by( ):
+    # Kết nối tới cơ sở dữ liệu
+    conn = sqlite3.connect('database/offer.db')
+    cursor = conn.cursor()
+
+    # Thực hiện truy vấn dữ liệu từ bảng
+    # chuyển dữ liệu qua bảng mới basic_login_register2
+    
+    # cursor.execute(f"SELECT * FROM offer_basic order by CAST(num_reviews AS INTEGER) DESC ", (id_hotel,))
+    cursor.execute(f"SELECT * FROM offer_basic ORDER BY CAST(num_reviews AS INTEGER) DESC ")
+    data = cursor.fetchall()
+
+    # Đóng kết nối
+    # conn.close()
+    # if data:
+    #     for i in data:
+    #         columns = ['id', 'id_hotel', 'hotel_name', 'stars','price','num_reviews' ,'avata_img','describe_hotel', 'createdTime']
+    #         data_dict = dict(zip(columns, data))
+    #     return data_dict
+    # else:
+    #     return None
+    
+    # return data
 
     
 
@@ -68,6 +92,45 @@ def save_data_for_offer_in_table( id_hotel, hotel_name,stars,price,num_reviews,a
     conn.commit()
     conn.close()
 
+# def sort_data_offer_database(table_name,price_offer=None,location_offer=None,star_offer=None,distance_offer=None,review_offer=None):
+#     conn = sqlite3.connect('database/offer.db')
+#     cursor = conn.cursor()
+#     query_text1 = ""
+#     query_text2 = ""
+#     query_string_text = f"SELECT * FROM {table_name}"
+#     where_query_string = f"WHERE {query_text1}"
+#     orfer_by_query_string = f"ORDER BY {query_text2}"
+#     if price_offer is not None:
+#         if price_offer == "ascending_price":
+
+
+            
+    
+#     decrease_price
+
+#     default_location
+#     a_to_z_location
+
+#     show_all_star
+#     ascending_star
+#     decrease_star
+#     three_star
+#     four_star
+#     five_star
+
+#     default_distance
+
+#     default_review
+#     ascending_review
+#     decrease_review
+
+#     data = cursor.fetchone()
+#     if data:
+#         columns = ['id', 'id_hotel', 'hotel_name', 'stars','price','num_reviews' ,'avata_img','describe_hotel', 'createdTime']
+#         data_dict = dict(zip(columns, data))
+#         return data_dict
+#     else:
+#         return None
 
 # a = doc_du_lieu(file_path="test3.txt")
 # # print(a)
@@ -97,5 +160,8 @@ def save_data_for_offer_in_table( id_hotel, hotel_name,stars,price,num_reviews,a
 # print(f'num_reviews = {d["num_reviews"]}')
 # print(f'createdTime = {d["createdTime"]}')
 
+a = query_database_for_offer_by_id_hotel_order_by()
+print(len(a))
+print(type(a[1]))
 
 

@@ -1,10 +1,12 @@
+# phầm import các thư viện dngf trong dự án và import các file , api khác vào file app1.py để sử dụng .
+
 import asyncio
 import json
-from fastapi import FastAPI, HTTPException 
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException # import fastapi để sử dụng trong dự án
+from fastapi.middleware.cors import CORSMiddleware # import thư viện cors để bỏ chặn bảo mật giữa frontend và backend
 from pydantic import BaseModel
 
-
+# import các thư viện và api khác tự tạo ở các file khác vào file app1.py này để sử dụng
 from login_register_database import query_database_for_login_register_by_name,save_data_for_login_register_in_table,query_database_for_login_register_by_email,update_user_by_email
 
 from base_code.get_code import generate_random_6_digit_number
@@ -35,12 +37,12 @@ from connect_api_travel import get_data_hotel_from_api_rapidapi
 from offers_database import query_database_for_offer_by_id_hotel
 # from .router_home import 
 
-app = FastAPI()
+app = FastAPI() # khởi tạo app fastapi
 
 # Cấu hình CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Sửa đổi danh sách này để chỉ định các nguồn mà bạn muốn chấp nhận yêu cầu từ
+    allow_origins=["*"],  #  chỉ định các nguồn mà bạn muốn chấp nhận yêu cầu từ server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -52,14 +54,14 @@ class Data(BaseModel):
     email:str
     islogin:bool
 
-# login 
-@app.post("/api/login_basic")
-async def login_basic(request_data: dict):
+# chức năng login 
+@app.post("/api/login_basic") # api login 
+async def login_basic(request_data: dict): # hàm xử lý chức năng login
     if request_data:
-        name_user = request_data["name"]
+        name_user = request_data["name"] # nhận các tham số từ frontend
         password = request_data['pass']
-        login_check = query_database_for_login_register_by_name(name=name_user)
-        login_token = generate_random_token_string(length=12)
+        login_check = query_database_for_login_register_by_name(name=name_user) # truy xuất trong database bằng name truyền vào từ frontend
+        login_token = generate_random_token_string(length=12) # tạo token cho phiên đăng nhập
         if login_check:
             # id1_,name1 , email1 , password1, createdtime1 = login_check
             password1 = login_check["password"]
@@ -87,22 +89,22 @@ async def login_basic(request_data: dict):
         
 
 
-# forgot password 
-@app.post("/api/forgot_password_basic")
-async def forgot_password_basic(request_data: dict):
+#chức năng forgot password 
+@app.post("/api/forgot_password_basic") # api đăng nhập
+async def forgot_password_basic(request_data: dict): # hàm chức năng đăng nhập
     if request_data:
-        email = request_data["email"]
+        email = request_data["email"] # lấy data từ frontend
         password = request_data["pass"]
 
-        time_now = gettime2()
-        check_email = query_database_for_login_register_by_email(email=email)
+        time_now = gettime2() # lấy time hiện tại
+        check_email = query_database_for_login_register_by_email(email=email) # truy xuất databas bằng email 
 
         if check_email :
-            code = generate_random_6_digit_number()
+            code = generate_random_6_digit_number() # tạo code để xác nhận cho chức năng quên mật khẩu
             # id_, name_,email_, password_,createdtime_ = check_email
             name_ = check_email["username"]
-            save_data_for_confirm_code_in_table(email=email,code=code,createdTime=time_now,username=name_)
-            send_email_forgot_password(code=code,password=passwords["outlook"],to_email=email,username=name_)
+            save_data_for_confirm_code_in_table(email=email,code=code,createdTime=time_now,username=name_) # lưu code,name và email vào catcha
+            send_email_forgot_password(code=code,password=passwords["outlook"],to_email=email,username=name_) # giử email quên mật khẩu
             return {"response":{
                     "message":responses["check_email_to_get_code"],
                     "status":True
@@ -126,7 +128,7 @@ async def forgot_password_confirm_code_email(request_data: dict):
         print(f"time now {time_now}")
         print(type(time_now))
         #get code from catcha ( sqlite delete after 3 minutes)
-        check_code = query_data_by_email_with_max_id(email=email)
+        check_code = query_data_by_email_with_max_id(email=email) 
         id1 , username1,email1,createdTime1 ,code1 = check_code
         print(f"created time = {createdTime1}")
         if check_code:
@@ -150,7 +152,7 @@ async def forgot_password_confirm_code_email(request_data: dict):
                         "status":False
                     }}
 
-# register
+# chức năng register
 @app.post("/api/register_basic")
 async def register_basic(request_data: dict):
     if request_data:
@@ -161,7 +163,7 @@ async def register_basic(request_data: dict):
         email = request_data['email']
         
         time_now = gettime2()
-        check_email = query_database_for_login_register_by_email(email=email)
+        check_email = query_database_for_login_register_by_email(email=email) # truy xuất dữ liệu bằng email cho chức năng đăng ký
         if check_email :
                 return {"response":{
                     "message":responses["email_da_duoc_dang_ky"],
@@ -172,8 +174,8 @@ async def register_basic(request_data: dict):
             #send confirm email
             code_randum = generate_random_6_digit_number()
             
-            send_email_confirm_registration(username=name,code=code_randum,password=passwords["outlook"],to_email=email)
-            save_data_for_confirm_code_in_table(createdTime=time_now,email=email,username=name,code=code_randum)
+            send_email_confirm_registration(username=name,code=code_randum,password=passwords["outlook"],to_email=email) # gửi email
+            save_data_for_confirm_code_in_table(createdTime=time_now,email=email,username=name,code=code_randum) # lưu data vào catcha
             # asyncio.create_task(delayed_delete_confirm_code_by_email(email=email,delay_minutes=3))# chức năng này tạm thời đóng băng để thực hiện giải pháp khác ( so sánh time tạo và time truy cập)
             
             return {"response":{
@@ -200,14 +202,14 @@ async def register_confirm_code_email(request_data: dict):
         print(f"time now {time_now}")
         print(type(time_now))
         #get code from catcha ( sqlite delete after 3 minutes)
-        check_code = query_data_by_email_with_max_id(email=email)
+        check_code = query_data_by_email_with_max_id(email=email) # hàm check code catcha
         id1 , username1,email1,createdTime1 ,code1 = check_code
         print(f"created time = {createdTime1}")
         if check_code:
             check_time = check_time_range(now_time=time_now,created_time=createdTime1,minute=3)#true nếu tạo và truy cập trong khoảng 3 phút
             if check_time:
                 if code1 == code:
-                    save_data_for_login_register_in_table(createdTime=time_now,email=email,password=password,username=username1)
+                    save_data_for_login_register_in_table(createdTime=time_now,email=email,password=password,username=username1) # lưu thông tin
                     return {"response":{
                         "message":responses["dang_ky_thanh_cong"],
                         "status":True
@@ -223,7 +225,7 @@ async def register_confirm_code_email(request_data: dict):
                         "status":False
                     }}
 
-# contact
+# chức năng contact
 @app.post("/api/contact_basic")
 async def contact_basic(request_data: dict):
     if request_data:
@@ -234,8 +236,8 @@ async def contact_basic(request_data: dict):
 
         tim_now = gettime2()
 
-        save_data_for_contact_in_table(createdTime=tim_now,email=email,username=name,message=message,subject=subject)
-        send_email_reminder_admin_about_contact_customer(username=name,created_time=tim_now,password=passwords["outlook"],to_email=emails["email_admin"])
+        save_data_for_contact_in_table(createdTime=tim_now,email=email,username=name,message=message,subject=subject) # lưu thông tin contact
+        send_email_reminder_admin_about_contact_customer(username=name,created_time=tim_now,password=passwords["outlook"],to_email=emails["email_admin"]) #gửi email cho admin
         return {"response":{
                         "message":responses["cam_on_dong_gop_cua_ban"],
                         "status":True
@@ -296,7 +298,7 @@ async def get_tourist_destination_information():
 
         # max_id = get_max_id_from_table(path_of_database='database\\tourist_destination_information.db',table_name="type_of_file_img")
         # randum_num = random_number(end=max_id,start=1)
-        ttestdata =  query_database_for_tourist_destination_information_by_id(random_num_list[i])
+        ttestdata =  query_database_for_tourist_destination_information_by_id(random_num_list[i]) # lấy thông tin các tour du lịch
         testdata2 = query_database_for_type_file_img_by_id(random_num_list[i])
         id_ , name_ , type_file_ = testdata2
         # id ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = ttestdata
@@ -344,7 +346,7 @@ async def tourist_destination_information_by_name(request_data: dict):
         # print(name_)
         # get_all_data_from_table()
         
-        data_ = query_database_for_tourist_destination_information_by_name(name=name_)
+        data_ = query_database_for_tourist_destination_information_by_name(name=name_) # lấy thông tin các tour du lịch
         # print(data_)
         tourist_destination_name = data_["tourist_destination_name"]
         img_base64 = data_["img_base64"]
@@ -356,7 +358,7 @@ async def tourist_destination_information_by_name(request_data: dict):
         number_of_travel_days = data_["number_of_travel_days"]
         lat = data_["lat"]
         lon = data_["lon"]
-        five_day_weather_datas = get_5_datas_from_5_day_weather(lang="vi",lat=lat,lon=lon)
+        five_day_weather_datas = get_5_datas_from_5_day_weather(lang="vi",lat=lat,lon=lon) # lấy thông tin thời tiết
         # id_ ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = data_
         return {
             "response":{
@@ -389,7 +391,7 @@ async def get_user_infor(request_data: dict):
         #     id_ = username_ = email_ =  avatar_img_ = birthday_ = createdTime_ = ""
         # else:
         #     id_ , username_,email_, avatar_img_,birthday_,createdTime_ = data1
-        data2 = query_database_for_login_register_by_email(email=email)
+        data2 = query_database_for_login_register_by_email(email=email) # lây thông tin người dùng
         # print(data2)
         # id2_ ,username2_, email2_,password2_,createdTime2_ = data2
         username2_ = data2['username'] 
@@ -438,8 +440,8 @@ async def edit_user_infor(request_data: dict):
         if email_:
             check_email = query_database_for_login_register_by_email(email=email_)
             if check_email :
-                check_username = query_database_for_login_register_by_name(name=username_)
-                update_user_by_email(column="birthday",email=email_,value=birthday_)
+                check_username = query_database_for_login_register_by_name(name=username_) # lấy thông tin người dùng
+                update_user_by_email(column="birthday",email=email_,value=birthday_) # update các thông tin mới 
                 update_user_by_email(column="password",email=email_,value=password_)
                 update_user_by_email(column="avata_img",email=email_,value=avatar_img_)
                 if check_username:
@@ -459,10 +461,11 @@ async def edit_user_infor(request_data: dict):
                     "message":responses["email_chua_duoc_dang_ky"],
                     "status":False
                 }}
-            
+
+# chức năng offer hotel đăng hoàn thiện       
 @app.post("/api/get_offer_data")
 async def get_offer_data(request_data: dict):
-    max_id = get_max_id_from_table(path_of_database="database\offer.db",table_name="offer_basic")
+    max_id = get_max_id_from_table(path_of_database="database\offer.db",table_name="offer_basic") # lấy maxid từ bằng offer
     if request_data:
         # print(request_data)
         if request_data["default"] == "yes":
@@ -475,7 +478,7 @@ async def get_offer_data(request_data: dict):
             describe_hotel_1_list = []
 
             for i in range(1,max_id):
-                data1 = query_database_for_offer_by_id_hotel(id_hotel=1000+i)
+                data1 = query_database_for_offer_by_id_hotel(id_hotel=1000+i)# lấy các dữ liệu offer hotel
                 id_hotel_1 = data1["id_hotel"]
                 hotel_name_1 = data1["hotel_name"]
                 stars_1 = data1["stars"]
@@ -505,13 +508,14 @@ async def get_offer_data(request_data: dict):
                 
             }
         }  
+        elif request_data["default"] == "no":
 
-        default = request_data["default"]
-        price_offer = request_data["price_offer"]
-        location_offer = request_data["location_offer"]
-        star_offer = request_data["star_offer"]
-        distance_offer = request_data["distance_offer"]
-        review_offer = request_data["review_offer"]
+            # default = request_data["default"]
+            price_offer = request_data["price_offer"]
+            location_offer = request_data["location_offer"]
+            star_offer = request_data["star_offer"]
+            distance_offer = request_data["distance_offer"]
+            review_offer = request_data["review_offer"]
         
         # if 
 
@@ -541,4 +545,4 @@ async def get_offer_data(request_data: dict):
 # nơi khởi chạy
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app1:app", port=8080, workers=5, reload=True)
+    uvicorn.run("app1:app", port=8080, workers=5, reload=True) # chạy trên cổng 8080 , worker = 5 và có reload để mỗi khi dự án thay đổi thì tự động cập nhật

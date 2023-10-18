@@ -34,7 +34,7 @@
 
 ### Cấu trúc dự án :
 
-#### Trong folder database là các tệp database được sử dụng trong dự án ( do sqlite không có hệ quản trị database ) gồm các file .db như : database\booking_tour.db là file database chứa các thông tin về việc booking tour , database\catchat_code_for_send_email.db chứa các thông tin để cho quá trình xác thực code (trong 3 phút) hoạt động được , database\contact.db chứa các thông tin người dùng contact với website , database\login_register.db chứa các thông về việc đăng nhập đang ký và quên mật khẩu của người dùng , database\tourist_destination_information.db chứa các thông tin về các tour du lịch của web để front-end lấy và hiển thị , database\user_infor.db chứa các thông tin nâng cao hơn về user (như : ảnh đại diện và ngày sinh)
+#### Trong folder database là các tệp database được sử dụng trong dự án ( do sqlite không có hệ quản trị database ) gồm các file .db như : database\booking_tour.db là file database chứa các thông tin về việc booking tour , database\catchat_code_for_send_email.db chứa các thông tin để cho quá trình xác thực code (trong 3 phút) hoạt động được , database\contact.db chứa các thông tin người dùng contact với website , database\login_register.db chứa các thông về việc đăng nhập đang ký và quên mật khẩu của người dùng , database\tourist_destination_information.db chứa các thông tin về các tour du lịch của web để front-end lấy và hiển thị , database\user_infor.db chứa các thông tin nâng cao hơn về user (như : ảnh đại diện và ngày sinh) , database\offer.db chứa các thông tin và offer hotel như tên khách sạn giá mỗi đêm và mô tả nhưng chức năng offer đang trong quá trình hoàn thiện , database\visual_hotels_and_restaurent.db chứa các thông tin mô phỏng một dữ liệu api ảo để sử dụng với điều kiện wifi không ổn định và cũng để tiết kiệm thời gian load trang nhưng chức năng này cũng đang trong quá trình hoàn thiện.
 
 #### Trong folder base_code là các tệp base chứa các hàm thường sử dụng trong dự án (có 2 file là base_code\security_info.py,base_code\string_python_en.py là các tệp nội bộ chứa các thông tin cần thiết , key để sử dụng các chức năng có bảo mật ) , base_code\cover_base_64_img.py là file cover dạng ảnh byte thành dạng base64 để tiện lưu và truyền tải 
 
@@ -42,7 +42,7 @@
 
 #### Trong folder test_python_code là folder chứa các tệp test để thử nghiệm trước khi mang vào dự án chính
 
-#### File app1.py là file chính trong dự án ( file chạy Fastapi) chứa các api để thao tác các chức năng với front-end và api khác để lấy dữ liệu 
+#### File app1.py là file chính trong dự án ( file chạy Fastapi) chứa các api để thao tác các chức năng với front-end và api khác để lấy dữ liệu ( trong file app1.py có comment khá chi tiết các chức năng)
 
 #### File connect_open_weather_api.py chứa các hàm thao tác , lấy và lọc data để gửi cho front-end hiển thị 
 
@@ -56,6 +56,25 @@
 
 ### Mô tả chi tiết bằng biểu đồ
 
-![Anh biểu đồ đăng ký](D:\cong_nghe_web\img_destination_information\Picture1.png)
 ![Anh biểu đồ đăng ký](Picture1.png)
+#### đăng ký
+![](Picture2.png)
+#### đăng nhập
+![Alt text](Picture3.png)
+#### quên mật khẩu
+![Alt text](Picture4.png)
+#### chỉnh sửa thông tin cá nhân
+![Alt text](Picture5.png)
+#### xem thời tiết
+![Alt text](Picture6.png)
+#### database đăng ký đăng nhập
+![Alt text](Picture7.png)
+#### database catcha code
+![Alt text](Picture8.png)
+#### database contact liên hệ
+![Alt text](Picture9.png)
+#### database  thông tin địa điểm du lịch
+![Alt text](Picture10.png)
+#### database booking tour
+
 
