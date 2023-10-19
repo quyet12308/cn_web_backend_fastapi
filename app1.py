@@ -34,7 +34,7 @@ from book_hotel_restaurant_database import create_database_for_visual_hotels_and
 
 from connect_api_travel import get_data_hotel_from_api_rapidapi
 
-from offers_database import query_database_for_offer_by_id_hotel
+from offers_database import query_database_for_offer_by_id_hotel,sort_data_offer_database
 # from .router_home import 
 
 app = FastAPI() # khởi tạo app fastapi
@@ -464,81 +464,46 @@ async def edit_user_infor(request_data: dict):
 
 # chức năng offer hotel đăng hoàn thiện       
 @app.post("/api/get_offer_data")
+        
+   
 async def get_offer_data(request_data: dict):
-    max_id = get_max_id_from_table(path_of_database="database\offer.db",table_name="offer_basic") # lấy maxid từ bằng offer
     if request_data:
-        # print(request_data)
-        if request_data["default"] == "yes":
-            id_hotel_1_list = []
-            hotel_name_1_list = []
-            stars_1_list = []
-            price_1_list = []
-            num_reviews_1_list = []
-            avata_img_1_list = []
-            describe_hotel_1_list = []
 
-            for i in range(1,max_id):
-                data1 = query_database_for_offer_by_id_hotel(id_hotel=1000+i)# lấy các dữ liệu offer hotel
-                id_hotel_1 = data1["id_hotel"]
-                hotel_name_1 = data1["hotel_name"]
-                stars_1 = data1["stars"]
-                price_1 = data1["price"]
-                num_reviews_1 = data1["num_reviews"]
-                avata_img_1 = data1["avata_img"]
-                describe_hotel_1 = data1["describe_hotel"]
-                id_hotel_1_list.append(id_hotel_1)
-                hotel_name_1_list.append(hotel_name_1)
-                stars_1_list.append(stars_1)
-                price_1_list.append(price_1)
-                num_reviews_1_list.append(num_reviews_1)
-                avata_img_1_list.append(avata_img_1)
-                describe_hotel_1_list.append(describe_hotel_1)
-            return {
+        price_offer = request_data["price_offer"]
+        name_hotel_offer = request_data["name_hotel_offer"]
+        star_offer = request_data["star_offer"]
+        distance_offer = request_data["distance_offer"]
+        review_offer = request_data["review_offer"]
+
+        print(f"{price_offer} , {name_hotel_offer} , {star_offer} , {distance_offer} , {review_offer}")
+
+        data = sort_data_offer_database(
+            table_name="offer_basic",
+            distance_offer=distance_offer,
+            name_hotel_offer=name_hotel_offer,
+            price_offer=price_offer,
+            star_offer=star_offer,
+            review_offer=review_offer
+            )
+        
+        return {
             "response":{
                 "status":True,
                 'message':{
-                    "id_hotel":id_hotel_1_list,
-                    "hotel_name":hotel_name_1_list,
-                    "stars": stars_1_list,
-                    "price":price_1_list,
-                    "num_reviews":num_reviews_1_list,
-                    "avata_img":avata_img_1_list,
-                    "describe_hotel":describe_hotel_1_list
+                    "id_hotel":data["id_hotel"],
+                    "hotel_name":data["hotel_name"],
+                    "stars": data["stars"],
+                    "price":data["price"],
+                    "num_reviews":data["num_reviews"],
+                    "avata_img":data["avata_img"],
+                    "describe_hotel":data["describe_hotel"]
                 }
                 
             }
         }  
-        elif request_data["default"] == "no":
 
-            # default = request_data["default"]
-            price_offer = request_data["price_offer"]
-            location_offer = request_data["location_offer"]
-            star_offer = request_data["star_offer"]
-            distance_offer = request_data["distance_offer"]
-            review_offer = request_data["review_offer"]
-        
-        # if 
-
-        # save_data_for_contact_in_table(createdTime=tim_now,email=email,username=name,message=message,subject=subject)
-        # send_email_reminder_admin_about_contact_customer(username=name,created_time=tim_now,password=passwords["outlook"],to_email=emails["email_admin"])
-        # return {
-        #     "response":{
-        #         "status":True,
-        #         'message':{
-        #             "username":username2_,
-        #             "avatar_img":avatar_img2_,
-        #             "birthday": birthday2_,
-        #             "email":email2_,
-        #             "password":password2_,
-        #             "createdTime":createdTime2_
-        #         }
-                
-        #     }
-        # }      
-
-    
-
-
+@app.post()
+async def 
         
 
         
