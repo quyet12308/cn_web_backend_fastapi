@@ -256,3 +256,9 @@ def query_database_for_login_session_by_email( email):
 # for i in range(15):
 #     c = query_database_for_login_session_by_email(email='1@gmail.com')
 #     print(c)
+
+# f = query_database_for_login_register_by_name(name="nhom13")
+# key_test1 = ['email', 'password','birthday' ]
+# # print(f[""])
+# for i in key_test1:
+#     print(f"{i} = {f[i]}")

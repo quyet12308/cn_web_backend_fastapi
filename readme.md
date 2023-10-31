@@ -46,6 +46,12 @@ python app1.py
 
 - Edit user: Chỉnh sửa thông tin người dùng , nếu chỉnh sửa thông tin hợp lệ thì sửa thông tin vào database
 
+- Booking tour : Đặt được các tour du lịch mong muốn , có thông tin khách sạn 
+
+- Xóa tour booking : Xóa tour booking 
+
+- Xem tất cả các tour du lịch .
+
 ### Cấu trúc dự án :
 
 - Trong folder **database** là các tệp database được sử dụng trong dự án ( do sqlite không có hệ quản trị database ) gồm các file .db như : database\booking_tour.db là file database chứa các thông tin về việc booking tour , database\catchat_code_for_send_email.db chứa các thông tin để cho quá trình xác thực code (trong 3 phút) hoạt động được , database\contact.db chứa các thông tin người dùng contact với website , database\login_register.db chứa các thông về việc đăng nhập đang ký và quên mật khẩu của người dùng , database\tourist_destination_information.db chứa các thông tin về các tour du lịch của web để front-end lấy và hiển thị , database\user_infor.db chứa các thông tin nâng cao hơn về user (như : ảnh đại diện và ngày sinh) , database\offer.db chứa các thông tin và offer hotel như tên khách sạn giá mỗi đêm và mô tả nhưng chức năng offer đang trong quá trình hoàn thiện , database\visual_hotels_and_restaurent.db chứa các thông tin mô phỏng một dữ liệu api ảo để sử dụng với điều kiện wifi không ổn định và cũng để tiết kiệm thời gian load trang nhưng chức năng này cũng đang trong quá trình hoàn thiện.
@@ -59,6 +65,8 @@ python app1.py
 - File **app1.py**  là file chính trong dự án ( file chạy Fastapi) chứa các api để thao tác các chức năng với front-end và api khác để lấy dữ liệu ( trong file app1.py có comment khá chi tiết các chức năng)
 
 - File **connect_open_weather_api.py**  chứa các hàm thao tác , lấy và lọc data để gửi cho front-end hiển thị 
+
+- File **booking_tour_database.py** chứa các hàm thao tác với database phần booking tour 
 
 - File **contact_database.py**  chưa các hàm thao tác với cơ sở dữ liệu phần contact 
 

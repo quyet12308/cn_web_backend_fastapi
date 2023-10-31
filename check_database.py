@@ -67,7 +67,7 @@ def get_max_id_from_table(path_of_database,table_name):
 
 # print(check_table_in_database(path_to_database="database\\tourist_destination_information.db"))
 
-# print(structure_of_the_table(path_to_database="database\\tourist_destination_information.db",table_name="tourist_destination_information_basic_for_get_data"))
+# print(structure_of_the_table(path_to_database="database\\tourist_destination_information.db",table_name="tourist_destination_information_basic_for_get_data2"))
 
 
 # a = structure_of_the_table(path_to_database="database\offer.db",table_name="offer_basic")

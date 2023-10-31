@@ -19,10 +19,10 @@ from contact_database import query_data_for_contact_in_table_by_email,save_data_
 
 from email_with_python.send_emails import send_email_confirm_registration,send_email_forgot_password,send_email_reminder_admin_about_contact_customer
 
-from base_code.gettime import gettime2,check_time_range,gettime3
+from base_code.gettime import gettime2,check_time_range,gettime3,check_availability,check_time_range2,gettime4
 from base_code.get_token import generate_random_token_string
 
-from home_screen_database import query_database_for_tourist_destination_information_by_id,get_all_data_from_table,save_data_in_table_tourist_destination_information,query_database_for_type_file_img_by_id,query_database_for_tourist_destination_information_by_name
+from home_screen_database import query_database_for_tourist_destination_information_by_id,get_all_data_from_table,save_data_in_table_tourist_destination_information,query_database_for_type_file_img_by_id,query_database_for_tourist_destination_information_by_name,query_database_for_tourist_destination_information_all_table
 
 from check_database import get_max_id_from_table,check_table_existence
 
@@ -35,6 +35,8 @@ from book_hotel_restaurant_database import create_database_for_visual_hotels_and
 from connect_api_travel import get_data_hotel_from_api_rapidapi
 
 from offers_database import query_database_for_offer_by_id_hotel,sort_data_offer_database
+
+from booking_tour_database import delete_data_booking_tour_by_id,update_data_booking_tour_by_id,save_data_for_booking_tour_basic_in_table,query_database_for_booking_tour_by_email,query_database_for_booking_tour_by_id,query_database_for_booking_tour_by_email_all,delete_data_booking_tour_by_email_and_created_time
 # from .router_home import 
 
 app = FastAPI() # khởi tạo app fastapi
@@ -358,6 +360,7 @@ async def tourist_destination_information_by_name(request_data: dict):
         number_of_travel_days = data_["number_of_travel_days"]
         lat = data_["lat"]
         lon = data_["lon"]
+        hotel_info = data_["hotel_info"]
         five_day_weather_datas = get_5_datas_from_5_day_weather(lang="vi",lat=lat,lon=lon) # lấy thông tin thời tiết
         # id_ ,tourist_destination_name,img_base64,price,the_right_time_to_go,createdTime,tourist_destination_describe,tourist_destination_location,number_of_stars ,number_of_travel_days = data_
         return {
@@ -372,7 +375,8 @@ async def tourist_destination_information_by_name(request_data: dict):
                     "tourist_destination_location":tourist_destination_location,
                     "number_of_stars":number_of_stars,
                     "number_of_travel_days":number_of_travel_days,
-                    "five_day_weather_datas":five_day_weather_datas
+                    "five_day_weather_datas":five_day_weather_datas,
+                    "hotel_info":hotel_info
                 }
                 
             }
@@ -385,12 +389,6 @@ async def get_user_infor(request_data: dict):
         name = request_data["name"]
         email = request_data["email"]
 
-        
-        # # print(data1)
-        # if data1 is None:
-        #     id_ = username_ = email_ =  avatar_img_ = birthday_ = createdTime_ = ""
-        # else:
-        #     id_ , username_,email_, avatar_img_,birthday_,createdTime_ = data1
         data2 = query_database_for_login_register_by_email(email=email) # lây thông tin người dùng
         # print(data2)
         # id2_ ,username2_, email2_,password2_,createdTime2_ = data2
@@ -406,7 +404,7 @@ async def get_user_infor(request_data: dict):
         #     avatar_img2_ = ""
         # if birthday2_ is None:
         #     birthday2_ = ""
-
+        # print(avatar_img2_)
         return {
             "response":{
                 "status":True,
@@ -502,8 +500,181 @@ async def get_offer_data(request_data: dict):
             }
         }  
 
-@app.post()
-async def 
+@app.post("/api/the_blog")
+async def the_blog(request_data: dict):
+    if request_data:
+        pass
+
+@app.post("/api/booking_tour")
+async def booking_tour(request_data: dict):
+    if request_data:
+        # print(request_data)
+        full_name = request_data["full_name"]
+        email = request_data["email"]
+        num_adults = request_data["num_adults"]
+        num_children = request_data["num_children"]
+        time = request_data["time"]
+        price = request_data["price"]
+        name_tour = request_data["name_tour"]
+        days = request_data["days"]
+        name_hotel = request_data["name_hotel"]
+
+        # check data
+        data = query_database_for_booking_tour_by_email(email=email)
+        if data == None:
+            # save data
+            t = gettime2()
+            save_data_for_booking_tour_basic_in_table(
+                booking_tour_name=name_tour,
+                createdTime=t,
+                days=days,
+                email=email,
+                fullname=full_name,
+                hotel_infor=name_hotel,
+                number_adults=num_adults,
+                number_children=num_children,
+                price=price,
+                timeCheckin=time
+            )
+            return  {
+                "response":{
+                    "status":True,
+                    'message': responses["booking_tour_thanh_cong"]
+                    
+                }
+            } 
+        else:
+            # print(data["days"])
+            # print(data["timeCheckin"])
+            # print(time)
+            check_time = check_availability(days=int(data["days"]),time1=data["timeCheckin"],time2=time)
+            if check_time:
+                t = gettime2()
+                save_data_for_booking_tour_basic_in_table(
+                booking_tour_name=name_tour,
+                createdTime=t,
+                days=days,
+                email=email,
+                fullname=full_name,
+                hotel_infor=name_hotel,
+                number_adults=num_adults,
+                number_children=num_children,
+                price=price,
+                timeCheckin=time
+            )
+                return  {
+                "response":{
+                    "status":True,
+                    'message': responses["booking_tour_thanh_cong"]
+                    
+                }
+            }
+            else:
+                return  {
+                "response":{
+                    "status":False,
+                    'message': responses["thoi_gian_nay_ban_dang_lua_chon_tour_du_lich_khac_roi"]
+                    
+                }
+            } 
+
+@app.post("/api/my_booking_tour")
+async def my_booking_tour(request_data: dict):
+    if request_data:
+        email = request_data["email"]
+        print(request_data)
+        data_list = query_database_for_booking_tour_by_email_all(email=email)
+        if data_list:
+            img_tours = []
+            for i in range(len(data_list)):
+                name_tour = data_list[i]["booking_tour_name"]
+                print(name_tour)
+                data4 = query_database_for_tourist_destination_information_by_name(name=name_tour)
+                img_tour = data4["img_base64"]
+                img_tours.append(img_tour)
+            return  {
+                "response":{
+                    "status":True,
+                    'message': {
+                        "data_list":data_list,
+                        "img_tours_list":img_tours
+                    }
+                    
+                }
+            } 
+        else:
+            return  {
+                "response":{
+                    "status":False,
+                    'message': responses["ban_chua_dang_ky_tour_du_lich_nao"]
+                    
+                }
+            } 
+@app.post("/api/delete_my_booking_tour")
+async def delete_my_booking_tour(request_data: dict):
+    if request_data:
+        email = request_data["email"]
+        created_time = request_data["created_time"]
+        timeCheckin = request_data["timeCheckin"]
+        # print(request_data)
+        # print(timeCheckin)
+        # print(created_time)
+
+        time_now = gettime4()
+        print(time_now)
+        check_time = check_time_range2(date2=str(timeCheckin),date1=time_now,days=3)
+        print(f"check time = {check_time}")
+        if check_time:
+            delete_data_booking_tour_by_email_and_created_time(createdTime=str(created_time),email=email)
+
+            return  {
+                "response":{
+                    "status":True,
+                    'message': responses["tour_du_lich_da_duoc_xoa_thanh_cong"]
+                }
+            }
+        else:
+            return  {
+                "response":{
+                    "status":False,
+                    'message': responses["tour_da_het_thoi_gian_de_xoa"]
+                }
+            }
+
+@app.get("/api/show_all_tour")
+async def show_all_tour():
+    data = query_database_for_tourist_destination_information_all_table()
+    id_list = data['id']
+    tourist_destination_name_list = data['tourist_destination_name']
+    img_base64_list = data["img_base64"]
+    price_list = data["price"]
+    the_right_time_to_go_list = data["the_right_time_to_go"]
+    number_of_stars_list = data["number_of_stars"]
+    tourist_destination_describe_list = data["tourist_destination_describe"]
+    tourist_destination_location_list = data["tourist_destination_location"]
+    number_of_travel_days_list = data["number_of_travel_days"]
+    hotel_info_list = data["hotel_info"]
+
+    return  {
+                "response":{
+                    "status":True,
+                    'message': {
+                        "id_list":id_list,
+                        "tourist_destination_name_list":tourist_destination_name_list,
+                        "img_base64_list":img_base64_list,
+                        "price_list":price_list,
+                        "the_right_time_to_go_list":the_right_time_to_go_list,
+                        "number_of_stars_list":number_of_stars_list,
+                        "tourist_destination_describe_list":tourist_destination_describe_list,
+                        "tourist_destination_location_list":tourist_destination_location_list,
+                        "number_of_travel_days_list":number_of_travel_days_list,
+                        "hotel_info_list":hotel_info_list
+                    }
+                }
+            } 
+    
+        
+
         
 
         

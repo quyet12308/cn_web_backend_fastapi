@@ -1,3 +1,7 @@
+import json
+# from base_code.cover_base_64_img import convert_image_to_base64
+# from home_screen_database import update_data_tourist_destination_information_by_id
+
 data = (
     ("0","name0","20","23-03-2002","email0"),
     ("1","name1","21","23-03-2012","email1"),
@@ -44,3 +48,15 @@ data = (
 #         text1 = ", ".join(arr)
 # print(text1)
 
+a = """Hồ bơi ngoài trời
+Chỗ đỗ xe miễn phí
+WiFi miễn phí
+Phòng gia đình
+Phòng không hút thuốc
+Tiện nghi cho khách khuyết tật
+Quầy bar
+Bữa sáng tốt
+"""
+
+arr = a.splitlines()
+print(arr)

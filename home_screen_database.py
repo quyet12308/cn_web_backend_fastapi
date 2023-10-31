@@ -1,4 +1,5 @@
 import sqlite3
+import json
 from base_code.gettime import gettime2
 from base_code.cover_base_64_img import convert_image_to_base64,show_image_from_base64,write_to_text_file
 
@@ -76,7 +77,7 @@ def query_database_for_tourist_destination_information_by_id( id):
 
     # return data
     if data:
-        columns = ['id','tourist_destination_name', 'img_base64', 'price', 'the_right_time_to_go', 'createdTime', 'tourist_destination_describe', 'tourist_destination_location', 'number_of_stars', 'number_of_travel_days','lat','lon']
+        columns = ['id','tourist_destination_name', 'img_base64', 'price', 'the_right_time_to_go', 'createdTime', 'tourist_destination_describe', 'tourist_destination_location', 'number_of_stars', 'number_of_travel_days','lat','lon','hotel_info','flight_info']
         data_dict = dict(zip(columns, data))
         return data_dict
     else:
@@ -96,8 +97,27 @@ def query_database_for_tourist_destination_information_by_name( name):
 
     # return data
     if data:
-        columns = ['id','tourist_destination_name', 'img_base64', 'price', 'the_right_time_to_go', 'createdTime', 'tourist_destination_describe', 'tourist_destination_location', 'number_of_stars', 'number_of_travel_days','lat','lon']
+        columns = ['id','tourist_destination_name', 'img_base64', 'price', 'the_right_time_to_go', 'createdTime', 'tourist_destination_describe', 'tourist_destination_location', 'number_of_stars', 'number_of_travel_days','lat','lon','hotel_info','flight_info']
         data_dict = dict(zip(columns, data))
+        return data_dict
+    else:
+        return None
+    
+def query_database_for_tourist_destination_information_all_table():
+    conn = sqlite3.connect('database/tourist_destination_information.db')
+    cursor = conn.cursor()
+
+    # Thực hiện truy vấn dữ liệu từ bảng
+    cursor.execute(f"SELECT * FROM tourist_destination_information_basic_for_get_data2 ")
+    data = cursor.fetchall()
+
+    # Đóng kết nối
+    conn.close()
+
+    # return data
+    if data:
+        columns = ['id','tourist_destination_name', 'img_base64', 'price', 'the_right_time_to_go', 'createdTime', 'tourist_destination_describe', 'tourist_destination_location', 'number_of_stars', 'number_of_travel_days','lat','lon','hotel_info','flight_info']
+        data_dict = dict(zip(columns, zip(*data)))
         return data_dict
     else:
         return None
@@ -117,6 +137,23 @@ def update_data_tourist_destination_information_by_id(id, column, value):
     # Lưu thay đổi và đóng kết nối
     conn.commit()
     conn.close()
+
+# thêm cột vào bảng
+def add_more_column_to_table_tourist_destination_information(column_name,column_type):
+    conn = sqlite3.connect('database/tourist_destination_information.db')
+    cursor = conn.cursor()
+
+    # Thêm cột mới 
+    cursor.execute(f"ALTER TABLE tourist_destination_information_basic_for_get_data2 ADD COLUMN {column_name} {column_type}")
+
+    # Lưu thay đổi
+    conn.commit()
+
+    # Đóng kết nối
+    conn.close()
+
+# add_more_column_to_table_tourist_destination_information(column_type="TEXT",column_name="hotel_info")
+# add_more_column_to_table_tourist_destination_information(column_type="TEXT",column_name="flight_info")
 
 
 # loại file database
@@ -325,8 +362,7 @@ data_test = data_dict.keys()
 # print(g)
 # print(g["tourist_destination_name"])
 
-# k = query_database_for_tourist_destination_information_by_id(id=5)
-# print(k["tourist_destination_name"])
+
 
 lat_and_lon = ['24.28 54.22', '35.04 109.05', '-12.2 -77.2', '33.12 103.54', '45:53 8:31', '0.48 -77.35', '51.30 -0.7', '-20.12 57.30', '26.52 100.14', '25.1 117.41', '27.56 109.36', '35.58 14.20', '36.24 25.25', '57 -4', '36.51 -5.10', '27.50 99.42', '36.15 -112.41']
 
@@ -368,3 +404,61 @@ lat_and_lon = ['24.28 54.22', '35.04 109.05', '-12.2 -77.2', '33.12 103.54', '45
 # update_data_tourist_destination_information_by_id(value="45.53",column="lat",id=5)
 # update_data_tourist_destination_information_by_id(value="8.31",column="lon",id=5)
 
+# k = query_database_for_tourist_destination_information_all_table()
+# print(k["tourist_destination_name"])
+# print(k["id"])
+
+
+# id_1 = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)
+
+v = ('Đại thánh đường Sheikh Zayed, Abu Dhabi',#1
+      'Đông Xuyên, Trung Quốc', 
+      'Ốc đảo sa mạc Huacachina', #3
+      'Cửu Trại Câu', 
+      'Isola Bella', #5
+      'Nhà thờ Las Lajas', 
+      'LonDon', #7
+      'Mauritius', 
+      'Lệ giang cổ trấn', #9
+      'Phúc Kiến Thổ Lâu', 
+      'Phượng Hoàng Cổ Trấn', #11
+      'Popeye, Malta', #12
+      'Santorini Greece', 'Scotland', 'Setenil de las Bodegas', 'Thung lũng Shangrila', 'Thác Havasu, Arizona')
+
+def cover_to_json_hotel_data(name , img , describe, star , link,some_amenities):
+    data = {
+        "name" : name,
+        "img" : img,
+        "describe" : describe,
+        "star" :star,
+        "link":link,
+        "some_amenities":some_amenities
+    }
+    return json.dumps(data,ensure_ascii=False)
+
+
+
+
+# a = cover_to_json_hotel_data(
+#     describe="Nơi nghỉ ở Lake Havasu City này cách Cầu Luân Đôn 5 phút lái xe. Nơi nghỉ này có 3 hồ bơi ngoài trời, 3 bể sục và bãi đậu xe có mái che miễn phí. Havasu Dunes có bếp nhỏ hoặc nhà bếp đầy đủ tiện nghi trong mỗi chỗ ở. Truyền hình cáp và đầu đĩa DVD cũng được bao gồm. Du khách có thể sử dụng phòng xông hơi khô hoặc tiện nghi giặt là tại Havasu Dunes. Tiện nghi nướng thịt bằng gas và Wi-Fi cũng được cung cấp. Công viên Tiểu bang Hồ Havasu cách Cồn cát WorldMark Havasu khoảng 8 km. Trung tâm mua sắm thời trang Island cách nơi nghỉ này 5 phút lái xe.",
+#     img=convert_image_to_base64(image_path="test_python_code\\img\\17.jpg"),
+#     link="https://www.booking.com/hotel/us/havasu-dunes-resort.vi.html?aid=318615&label=New_English_EN_VI_27026991385-SbfX4qC7oAyHRYJK_yRWPwS640819031013%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi55438833383%3Atiaud-297601666475%3Adsa-302962658775%3Alp1028580%3Ali%3Adec%3Adm%3Aag27026991385%3Acmp400679185&sid=4dd67f0c693c47ca078e452bc0859ff5&dest_id=20006548&dest_type=city&dist=0&group_adults=2&group_children=0&hapos=1&hpos=1&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&srepoch=1698589991&srpvid=a332665033b40130&type=total&ucfs=1&activeTab=main",
+#     name="WorldMark Havasu Dunes",
+#     star="4.4",
+#     some_amenities = ['Giặt ủi', 'Tiện nghi BBQ', 'Khu vực xem TV/sảnh chung', 'Sân gôn (trong vòng 3km)', 'Đi bộ đường dài', 'Hệ thống sưởi', 'Hồ bơi ngoài trời', 'Bãi đỗ xe miễn phí', 'Ghế/ghế dài tắm nắng', 'Phòng không hút thuốc']
+#     )
+
+# print(a)
+
+
+# update_data_tourist_destination_information_by_id(column="hotel_info",value=a,id=17) # đang làm đến cái id thứ 5 
+# update_data_tourist_destination_information_by_id(column="hotel_info",value=a,id=17) # đang làm đến cái id thứ 5 
+
+# b = query_database_for_tourist_destination_information_by_id(id=1)
+# # print(b["hotel_info"]["some_amenities"])
+# print(type(b))
+# print(type(b["hotel_info"]))
+
+# data_load = json.loads(b["hotel_info"])
+# print(type(data_load))
+# print(data_load["some_amenities"])

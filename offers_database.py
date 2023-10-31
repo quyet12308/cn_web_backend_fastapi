@@ -125,7 +125,7 @@ def sort_data_offer_database(table_name,price_offer=None,name_hotel_offer=None,s
             pass
         elif star_offer == "ascending_star":
             order_by_conditions.append(f"CAST(stars AS FLOAT) ASC")
-        elif star_offer == "decrease_price":
+        elif star_offer == "decrease_star":
             order_by_conditions.append(f"CAST(stars AS FLOAT) DESC")
         elif star_offer == "3_star":
             where_by_conditions.append(f"stars LIKE '3.%'")
